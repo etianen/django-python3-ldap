@@ -8,7 +8,7 @@ from contextlib import contextmanager
 
 from django.contrib.auth import get_user_model
 
-from django_python3_ldap.settings import settings
+from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import clean_ldap_name, resolve_user_identifier
 
 
@@ -36,21 +36,21 @@ class Connection(object):
         User = get_user_model()
         attributes = user_data["attributes"]
         # Create the user data.
-        user_data = {
+        user_fields = {
             field_name: attributes.get(attribute_name, ("",))[0]
             for field_name, attribute_name
             in settings.LDAP_AUTH_USER_FIELDS.items()
         }
-        user_data = settings.LDAP_AUTH_CLEAN_USER_DATA(user_data)
+        user_data = settings.LDAP_AUTH_CLEAN_USER_DATA(user_fields)
         # Create the user lookup.
         user_lookup = {
-            user_data.pop(field_name, "")
+            field_name: user_fields.pop(field_name, "")
             for field_name
             in settings.LDAP_AUTH_USER_LOOKUP_FIELDS
         }
         # Update or create the user.
         user, created = User.objects.update_or_create(
-            defaults = user_data,
+            defaults = user_fields,
             **user_lookup
         )
         # All done!
@@ -67,7 +67,7 @@ class Connection(object):
                 object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
             ),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = settings.LDAP_AUTH_USER_FIELDS.values(),
+            attributes = list(settings.LDAP_AUTH_USER_FIELDS.values()),
             paged_size = 30,
         )
         return (
@@ -89,24 +89,23 @@ class Connection(object):
         """
         # Parse the user lookup.
         user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS, True, args, kwargs)
-        if not user_identifier:
-            raise TypeError("")
         # Search the LDAP database.
+        search_filter = "(&(objectClass={object_class}){user_identifier})".format(
+            object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
+            user_identifier = "".join(
+                "({attribute_name}={field_value})".format(
+                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
+                    field_value = clean_ldap_name(field_value),
+                )
+                for field_name, field_value
+                in user_identifier.items()
+            ),
+        )
         if self._connection.search(
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
-            search_filter = "(&(objectClass={object_class}){user_identifier}".format(
-                object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
-                user_identifier = "".join(
-                    "({attribute_name}={field_value})".format(
-                        attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_LOOKUP_FIELDS[field_name]),
-                        field_value = clean_ldap_name(field_value),
-                    )
-                    for field_name, field_value
-                    in user_identifier.items()
-                ),
-            ),
+            search_filter = search_filter,
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = settings.LDAP_AUTH_USER_FIELDS.values(),
+            attributes = list(settings.LDAP_AUTH_USER_FIELDS.values()),
             size_limit = 1,
         ):
             return self._get_or_create_user(self._connection.response[0])
@@ -133,7 +132,7 @@ def connection(*args, **kwargs):
         username_dn = "{user_identifier},{search_base}".format(
             user_identifier = ",".join(
                 "{attribute_name}={field_value}".format(
-                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_LOOKUP_FIELDS[field_name]),
+                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
                     field_value = clean_ldap_name(field_value),
                 )
                 for field_name, field_value
@@ -144,13 +143,13 @@ def connection(*args, **kwargs):
     else:
         username_dn = None
     # Make the connection.
-    with ldap3.Connection(ldap3.Server(settings.LDAP_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
+    with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
         # Attempt authentication, if required.
         if user_identifier and not c.bind():
             yield None
         else:
             # We authenticated, so let's return the connection.
-            auth_connection = Connection(ldap3, c)
+            auth_connection = Connection(c)
             yield auth_connection
 
 
@@ -166,8 +165,9 @@ def authenticate(*args, **kwargs):
     The final positional argument, or the keyword argument `password`, will
     be taken as the user's password.
     """
-    user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS, True, args, kwargs)
+    user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS + ("password",), True, args, kwargs)
+    user_identifier.pop("password")
     with connection(*args, **kwargs) as c:
         if c is None:
             return None
-        return c.get_user(user_identifier)
+        return c.get_user(**user_identifier)

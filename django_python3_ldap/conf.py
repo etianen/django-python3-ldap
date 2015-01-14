@@ -1,3 +1,7 @@
+"""
+Settings used by django-python3.
+"""
+
 from django.conf import settings
 
 from django_python3_ldap.utils import clean_user_data
@@ -54,10 +58,10 @@ class LazySettings():
     LDAP_AUTH_USER_FIELDS = LazySetting(
         name = "LDAP_AUTH_USER_FIELDS",
         default = {
-            "uid" : "username",
-            "givenName": "first_name",
-            "sn": "last_name",
-            "mail": "email",
+            "username": "uid",
+            "first_name": "givenName",
+            "last_name": "sn",
+            "email": "mail",
         },
     )
 
@@ -74,6 +78,18 @@ class LazySettings():
         default = (
             "username",
         ),
+    )
+
+    # A username to use when running the live LDAP tests.
+    LDAP_TEST_USER_USERNAME = LazySetting(
+        name = "LDAP_TEST_USER_USERNAME",
+        default = "",
+    )
+
+    # A password to use when running the live LDAP tests.
+    LDAP_TEST_USER_PASSWORD = LazySetting(
+        name = "LDAP_TEST_USER_PASSWORD",
+        default = "",
     )
 
 
