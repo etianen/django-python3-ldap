@@ -1,0 +1,22 @@
+language: python
+sudo: false
+python:
+  - 3.2
+  - 3.3
+  - 3.4
+env:
+  - DJANGO=django==1.7.3
+matrix:
+  fast_finish: true
+cache:
+  directories:
+  - $HOME/.pip-cache/
+install:
+  - travis_retry pip install $DJANGO coverage --download-cache $HOME/.pip-cache
+  - pip install -e . --download-cache $HOME/.pip-cache
+script: 
+  - coverage run python tests/manage.py test django_python3_ldap
+after_script:
+  - coveage report
+notifications:
+  email: false
