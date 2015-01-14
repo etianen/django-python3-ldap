@@ -1,4 +1,5 @@
 from unittest import skipUnless
+from io import StringIO
 
 from django.test import TestCase
 from django.contrib.auth import authenticate
@@ -7,16 +8,88 @@ from django.conf import settings as django_settings
 from django.core.management import call_command
 
 from django_python3_ldap.conf import settings
+from django_python3_ldap.ldap import connection
 
 
 @skipUnless(settings.LDAP_TEST_USER_USERNAME, "No settings.LDAP_TEST_USER_USERNAME supplied.")
 @skipUnless(settings.LDAP_TEST_USER_PASSWORD, "No settings.LDAP_TEST_USER_PASSWORD supplied.")
+@skipUnless(settings.LDAP_AUTH_USER_LOOKUP_FIELDS == ("username",), "Cannot test using custom lookup fields.")
 @skipUnless(django_settings.AUTH_USER_MODEL == "auth.User", "Cannot test using a custom user model.")
 class TestLdap(TestCase):
 
     def setUp(self):
         super().setUp()
         User.objects.all().delete()
+
+    # Lazy settings tests.
+
+    def testLazySettingsInstanceLookup(self):
+        self.assertTrue(settings.LDAP_TEST_USER_USERNAME)
+
+    def testLazySettingsClassLookup(self):
+        self.assertEqual(settings.__class__.LDAP_TEST_USER_USERNAME.name, "LDAP_TEST_USER_USERNAME")
+        self.assertEqual(settings.__class__.LDAP_TEST_USER_USERNAME.default, "")
+
+    # LDAP tests.
+
+    def testGetUserArgsSuccess(self):
+        with connection() as c:
+            user = c.get_user(
+                settings.LDAP_TEST_USER_USERNAME,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.username, settings.LDAP_TEST_USER_USERNAME)
+
+    def testGetUserArgsIncorrectUsername(self):
+        with connection() as c:
+            user = c.get_user(
+                "bad" + settings.LDAP_TEST_USER_USERNAME,
+            )
+            self.assertEqual(user, None)
+
+    def testGetUserArgsExtraField(self):
+        with self.assertRaises(TypeError, msg="Expected arguments: username"):
+            with connection() as c:
+                c.get_user(
+                    settings.LDAP_TEST_USER_USERNAME,
+                    "foo",
+                )
+
+    def testGetUserKwargsSuccess(self):
+        with connection() as c:
+            user = c.get_user(
+                username = settings.LDAP_TEST_USER_USERNAME,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.username, settings.LDAP_TEST_USER_USERNAME)
+
+    def testGetUserKwargsIncorrectUsername(self):
+        with connection() as c:
+            user = c.get_user(
+                username = "bad" + settings.LDAP_TEST_USER_USERNAME,
+            )
+            self.assertEqual(user, None)
+
+    def testGetUserKwrgsExtraField(self):
+        with self.assertRaises(TypeError, msg="Expected arguments: username"):
+            with connection() as c:
+                c.get_user(
+                    username = settings.LDAP_TEST_USER_USERNAME,
+                    foo = "foo",
+                )
+
+    def testGetUserBothArgsAndKwargs(self):
+        with self.assertRaises(TypeError, msg="Cannot use both args and kwargs to identify a user"):
+            with connection() as c:
+                c.get_user(
+                    settings.LDAP_TEST_USER_USERNAME,
+                    username = settings.LDAP_TEST_USER_USERNAME,
+                )
+
+    def testGetUserMissingArgsAndKwargs(self):
+        with self.assertRaises(TypeError, msg="Expected arguments: username"):
+            with connection() as c:
+                c.get_user()
 
     # Authentication tests.
 
@@ -42,7 +115,7 @@ class TestLdap(TestCase):
         )
         self.assertEqual(user, None)
 
-    def testRepeatedUserAuthentication(self):
+    def testRepeatedUserAuthenticationDoestRecreateUsers(self):
         user_1 = authenticate(
             username = settings.LDAP_TEST_USER_USERNAME,
             password = settings.LDAP_TEST_USER_PASSWORD,
@@ -56,11 +129,19 @@ class TestLdap(TestCase):
 
     # User syncronisation.
 
-    def testSyncUsers(self):
+    def testSyncUsersCreatesUsers(self):
         call_command("ldap_sync_users", verbosity=0)
         self.assertGreater(User.objects.count(), 0)
 
-    def testReSyncUsers(self):
+    def testSyncUsersCommandOutput(self):
+        out = StringIO()
+        call_command("ldap_sync_users", verbosity=1, stdout=out)
+        rows = out.getvalue().split("\n")[:-1]
+        self.assertEqual(len(rows), User.objects.count())
+        for row in rows:
+            self.assertRegex(row, r'^Synced [^\s]+$')
+
+    def testReSyncUsersDoesntRecreateUsers(self):
         call_command("ldap_sync_users", verbosity=0)
         user_count_1 = User.objects.count()
         call_command("ldap_sync_users", verbosity=0)
