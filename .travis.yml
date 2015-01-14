@@ -6,11 +6,20 @@ python:
   - 3.4
 env:
   - DJANGO=django==1.7.3
+  global:
+    # LDAP_AUTH_URL
+    - secure: "YNnYSUnzs5XPS+f8sV0f4nTK/nmjgA2LUFIEznkI3b9F/d41w2RhvCI+S6cCo7VX8POdomUSKpIjWobBdQKWbO2nq7vsgjJdkSX0d9Wy19eiwSADSOALpuMbDMGXp9uI3H6mC3oPKES1upTaPKdpPQwa/8+7+h5QorEt2gHlZH0="
+    # LDAP_AUTH_SEARCH_BASE
+    - secure: "XITGh+4ssRZYa6odUhFhy8K2AY6P5aG8B7ZAtYeQYxeuW9Utd7xC++PxT+GJiu0xDIxxE2f5hjXZNERV0dI6y/9rc1y9r9G1GKadIAhDj4w2r3cP/2vZFeAnwpEjx5RqnWYoMYPwWfViOBVDjzuLYjwekKRIyZVcCw9es1xa6HM="
+    # LDAP_TEST_USER_USERNAME
+    - secure: "d16xnF9px3zDQf5MWAetKKIZedyr0GdgpxpoRHPgmdSHrexu9FVDlTnpbOBSzmK9u8aRUqw9Bij56wNhaYwf5Ae7XtnQpXIAfY95iVSQ7R3PnlscLc0zxD738FLxzNSSLWm4Aa+F3A7QcziOMYN9tcwoNUlusaI9vFcLnJ1BxBo="
+    # LDAP_TEST_USER_PASSWORD
+    - secure: "Tv0YdpnJ0mVVrKhFDwBv4DRbnllE0Nc/819n35PUbXs7+VzKiVTnyyEnHzL0Q/punyNACaj3j+4/vRUkRqpGMqbenjKfy3Gl6qg2Hopm8AfT8PLCDMljFP8lDrV99LqAlRIEUFNhP7hXvYMBFQRSt6t5BsOZbqfveuS9k3cF6wA="
 matrix:
   fast_finish: true
 cache:
   directories:
-  - $HOME/.pip-cache/
+    - $HOME/.pip-cache/
 install:
   - travis_retry pip install $DJANGO coverage --download-cache $HOME/.pip-cache
   - pip install -e . --download-cache $HOME/.pip-cache
