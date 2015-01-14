@@ -1,16 +1,19 @@
-# django-python3-ldap
+django-python3-ldap
+===================
 
 **django-python3-ldap** provides a Django LDAP user authentication backend for Python 3.
 
 
-## Features
+Features
+--------
 
 - Authenticate users with an LDAP server.
 - Sync LDAP users with a local Django database.
 - Works in Python 3!
 
 
-## Installation
+Installation
+------------
 
 1. Install using pip ``pip install django-python3-ldap``.
 2. Add ``'django_python3_ldap'`` to your ``INSTALLED_APPS`` setting.
@@ -19,7 +22,8 @@
 4. Optionally, run ``./manage.py ldap_sync_users`` to perform an initial sync of LDAP users.
 
 
-## Available settings
+Available settings
+------------------
 
 ::
 
@@ -51,9 +55,10 @@
     LDAP_AUTH_CLEAN_USER_DATA = django_python3_ldap.utils.clean_user_data
 
 
-## How it works.
+How it works
+------------
 
-When a user attempts to authenticate to your site, the a connection is made to the LDAP
+When a user attempts to authenticate, a connection is made to the LDAP
 server, and an attempt to bind using the provided username and password is made.
 
 If the bind attempt is successful, then the user details are loaded from the LDAP server
@@ -67,13 +72,15 @@ admin interface. Running ``ldap_sync_users`` as a background cron task is anothe
 keep all users in sync on a regular basis. 
 
 
-## Support and announcements
+Support and announcements
+-------------------------
 
 Downloads and bug tracking can be found at the `main project
 website <http://github.com/etianen/django-python3-ldap>`_.
 
     
-## More information
+More information
+----------------
 
 The django-python3-ldap project was developed by Dave Hall. You can get the code
 from the `django-python3-ldap project site <http://github.com/etianen/django-python3-ldap>`_.
