@@ -9,17 +9,18 @@ Features
 
 - Authenticate users with an LDAP server.
 - Sync LDAP users with a local Django database.
+- Supports custom Django user models.
 - Works in Python 3!
 
 
 Installation
 ------------
 
-1. Install using pip ``pip install django-python3-ldap``.
+1. Install using ``pip install django-python3-ldap``.
 2. Add ``'django_python3_ldap'`` to your ``INSTALLED_APPS`` setting.
 3. Set your ``AUTHENTICATION_BACKENDS`` setting to ``("django_python3_ldap.auth.LDAPBackend",)``
 4. Configure the settings for your LDAP server (see Available settings, below).
-4. Optionally, run ``./manage.py ldap_sync_users`` to perform an initial sync of LDAP users.
+5. Optionally, run ``./manage.py ldap_sync_users`` to perform an initial sync of LDAP users.
 
 
 Available settings
@@ -48,9 +49,9 @@ Available settings
     # A tuple of fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 
-    # Transforms the user data loaded from
+    # Callable that transforms the user data loaded from
     # LDAP into a form suitable for creating a user.
-    # Override this to set custom fields for your
+    # Override this to set custom field formatting for your
     # user model.
     LDAP_AUTH_CLEAN_USER_DATA = django_python3_ldap.utils.clean_user_data
 
@@ -59,16 +60,18 @@ How it works
 ------------
 
 When a user attempts to authenticate, a connection is made to the LDAP
-server, and an attempt to bind using the provided username and password is made.
+server, and the application attempts to bind using the provided username and password.
 
-If the bind attempt is successful, then the user details are loaded from the LDAP server
+If the bind attempt is successful, the user details are loaded from the LDAP server
 and saved in a local Django ``User`` model. The local model is only created once,
 and the details will be kept updated with the LDAP record details on every login.
 
 To perform a full sync of all LDAP users to the local database, run ``./manage.py ldap_sync_users``.
-This is not necessary, as the authentication backend will create users on demand. However,
-it will allow you to assign permissions and groups to the existing users using the Django
-admin interface. Running ``ldap_sync_users`` as a background cron task is another optional way to
+This is not required, as the authentication backend will create users on demand. Syncing users has
+the advantage of allowing you to assign permissions and groups to the existing users using the Django
+admin interface.
+
+Running ``ldap_sync_users`` as a background cron task is another optional way to
 keep all users in sync on a regular basis. 
 
 
