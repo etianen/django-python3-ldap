@@ -141,6 +141,7 @@ def connection(*args, **kwargs):
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
         )
     else:
+        password = None
         username_dn = None
     # Make the connection.
     with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
