@@ -13,7 +13,7 @@ setup(
     description = "Django LDAP user authentication backend for Python 3.",
     author = "Dave Hall",
     author_email = "dave@etianen.com",
-    url = "https://github.com/etianen/django-django-python3-ldap",
+    url = "https://github.com/etianen/django-python3-ldap",
     packages = find_packages(),
     install_requires = [
         "django>=1.7",
