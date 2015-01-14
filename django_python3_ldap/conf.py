@@ -44,7 +44,7 @@ class LazySettings():
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = LazySetting(
         name = "LDAP_AUTH_SEARCH_BASE",
-        default = "",
+        default = "ou=people,dc=example,dc=com",
     )
 
     # The LDAP class that represents a user.
@@ -65,19 +65,19 @@ class LazySettings():
         },
     )
 
-    # Transforms the user data loaded from
-    # LDAP into a form suitable for creating a user.
-    LDAP_AUTH_CLEAN_USER_DATA = LazySetting(
-        name = "LDAP_AUTH_CLEAN_USER_DATA",
-        default = clean_user_data,
-    )
-
-    # A tuple of fields that is used to uniquely identify a user.
+    # A tuple of fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = LazySetting(
         name = "LDAP_AUTH_USER_LOOKUP_FIELDS",
         default = (
             "username",
         ),
+    )
+
+    # Transforms the user data loaded from
+    # LDAP into a form suitable for creating a user.
+    LDAP_AUTH_CLEAN_USER_DATA = LazySetting(
+        name = "LDAP_AUTH_CLEAN_USER_DATA",
+        default = clean_user_data,
     )
 
     # A username to use when running the live LDAP tests.

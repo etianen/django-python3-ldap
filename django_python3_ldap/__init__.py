@@ -1,5 +1,5 @@
 """
-Django user authentication backend for Python 3.
+Django LDAP user authentication backend for Python 3.
 """
 
 

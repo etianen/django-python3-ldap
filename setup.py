@@ -10,7 +10,7 @@ setup(
     name = "django-python3-ldap",
     version = version_str,
     license = "BSD",
-    description = "Django user authentication backend for Python 3.",
+    description = "Django LDAP user authentication backend for Python 3.",
     author = "Dave Hall",
     author_email = "dave@etianen.com",
     url = "https://github.com/etianen/django-django-python3-ldap",
