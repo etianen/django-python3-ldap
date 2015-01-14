@@ -1,2 +1,0 @@
-django>=1.7
-python3-ldap==0.9.7
