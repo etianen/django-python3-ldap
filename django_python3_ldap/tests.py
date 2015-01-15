@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.conf import settings as django_settings
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
@@ -157,12 +157,12 @@ class TestLdap(TestCase):
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         # Promote the user.
-        call_command("promote_user", "test", stdout=StringIO())
+        call_command("ldap_promote", "test", stdout=StringIO())
         user = self.reload(user)
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
 
     def testPromoteMissingUser(self):
         with self.assertRaises(CommandError) as cm:
-            call_command("promote_user", "missing_user", verbosity=0)
+            call_command("ldap_promote", "missing_user", verbosity=0)
         self.assertEqual(force_text(cm.exception), "User with username missing_user does not exist")
