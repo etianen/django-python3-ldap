@@ -158,11 +158,10 @@ class TestLdap(TestCase):
         self.assertFalse(user.is_superuser)
         # Promote the user.
         call_command("ldap_promote", "test", stdout=StringIO())
-        user = self.reload(user)
+        user = User.objects.get(username="test")
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
 
     def testPromoteMissingUser(self):
-        with self.assertRaises(CommandError) as cm:
+        with self.assertRaises(CommandError, msg="User with username missing_user does not exist") as cm:
             call_command("ldap_promote", "missing_user", verbosity=0)
-        self.assertEqual(force_text(cm.exception), "User with username missing_user does not exist")
