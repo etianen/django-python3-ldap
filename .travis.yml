@@ -27,6 +27,6 @@ install:
 script: 
   - coverage run tests/manage.py test django_python3_ldap
 after_script:
-  - coveage report
+  - coverage report
 notifications:
   email: false
