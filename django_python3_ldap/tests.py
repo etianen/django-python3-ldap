@@ -147,3 +147,23 @@ class TestLdap(TestCase):
         call_command("ldap_sync_users", verbosity=0)
         user_count_2 = User.objects.count()
         self.assertEqual(user_count_1, user_count_2)
+
+    # User promotion.
+
+    def testPromoteUser(self):
+        User = get_user_model()
+        user = User.objects.create(
+            username = "test",
+        )
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        # Promote the user.
+        call_command("promote_user", "test", stdout=StringIO())
+        user = self.reload(user)
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+
+    def testPromoteMissingUser(self):
+        with self.assertRaises(CommandError) as cm:
+            call_command("promote_user", "missing_user", verbosity=0)
+        self.assertEqual(force_text(cm.exception), "User with username missing_user does not exist")
