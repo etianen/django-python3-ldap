@@ -40,9 +40,9 @@ AUTHENTICATION_BACKENDS = (
 
 # LDAP auth test settings.
 
-LDAP_TEST_USER_USERNAME = os.environ.get("LDAP_TEST_USER_USERNAME", "")
+LDAP_AUTH_TEST_USER_USERNAME = os.environ.get("LDAP_AUTH_TEST_USER_USERNAME", "")
 
-LDAP_TEST_USER_PASSWORD = os.environ.get("LDAP_TEST_USER_PASSWORD", "")
+LDAP_AUTH_TEST_USER_PASSWORD = os.environ.get("LDAP_AUTH_TEST_USER_PASSWORD", "")
 
 
 # Application definition

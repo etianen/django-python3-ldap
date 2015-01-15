@@ -81,14 +81,14 @@ class LazySettings():
     )
 
     # A username to use when running the live LDAP tests.
-    LDAP_TEST_USER_USERNAME = LazySetting(
-        name = "LDAP_TEST_USER_USERNAME",
+    LDAP_AUTH_TEST_USER_USERNAME = LazySetting(
+        name = "LDAP_AUTH_TEST_USER_USERNAME",
         default = "",
     )
 
     # A password to use when running the live LDAP tests.
-    LDAP_TEST_USER_PASSWORD = LazySetting(
-        name = "LDAP_TEST_USER_PASSWORD",
+    LDAP_AUTH_TEST_USER_PASSWORD = LazySetting(
+        name = "LDAP_AUTH_TEST_USER_PASSWORD",
         default = "",
     )
 
