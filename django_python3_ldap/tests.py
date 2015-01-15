@@ -151,7 +151,6 @@ class TestLdap(TestCase):
     # User promotion.
 
     def testPromoteUser(self):
-        User = get_user_model()
         user = User.objects.create(
             username = "test",
         )
