@@ -41,6 +41,11 @@ class LazySettings():
         default = "ldap://localhost:389",
     )
 
+    LDAP_AUTH_USE_TLS = LazySetting(
+        name = "LDAP_AUTH_USE_TLS",
+        default = False,
+    )
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = LazySetting(
         name = "LDAP_AUTH_SEARCH_BASE",
