@@ -145,6 +145,10 @@ def connection(*args, **kwargs):
         username_dn = None
     # Make the connection.
     with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
+
+        if settings.LDAP_AUTH_USE_TLS:
+            c.start_tls()
+
         # Attempt authentication, if required.
         if user_identifier and not c.bind():
             yield None
