@@ -31,6 +31,9 @@ Available settings
     # The URL of the LDAP server.
     LDAP_AUTH_URL = "ldap://localhost:389"
 
+    # Initiate TLS on connection.
+    LDAP_AUTH_USE_TLS = False
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = "ou=people,dc=example,dc=com"
 

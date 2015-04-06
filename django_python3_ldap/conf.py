@@ -41,6 +41,7 @@ class LazySettings():
         default = "ldap://localhost:389",
     )
 
+    # Initiate TLS on connection.
     LDAP_AUTH_USE_TLS = LazySetting(
         name = "LDAP_AUTH_USE_TLS",
         default = False,
