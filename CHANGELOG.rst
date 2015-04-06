@@ -2,6 +2,12 @@ django-python3-ldap changelog
 =============================
 
 
+0.9.2
+-----
+
+- Added setting for initiating TLS on connection (@saraheiting).
+
+
 0.9.1
 -----
 
