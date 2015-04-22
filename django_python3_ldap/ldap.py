@@ -127,9 +127,19 @@ def connection(*args, **kwargs):
     # Parse the user lookup.
     user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS + ("password",), False, args, kwargs)
     # Format the DN for the username.
-    if user_identifier:
-        password = user_identifier.pop("password")
-        username_dn = "{user_identifier},{search_base}".format(
+
+    connection_kwargs = {
+        "auto_bind": ldap3.AUTO_BIND_NONE
+    }
+
+    # perform simple auth if credentials are given
+    if settings.LDAP_AUTH_SIMPLEAUTH_USER:
+        connection_kwargs["password"] = settings.LDAP_AUTH_SIMPLEAUTH_PASSWORD
+        connection_kwargs["user"] = settings.LDAP_AUTH_SIMPLEAUTH_USER
+        connection_kwargs["authentication"] = ldap3.AUTH_SIMPLE
+    elif user_identifier:
+        connection_kwargs["password"] = user_identifier.pop("password")
+        connection_kwargs["user"] = "{user_identifier},{search_base}".format(
             user_identifier = ",".join(
                 "{attribute_name}={field_value}".format(
                     attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
@@ -141,10 +151,11 @@ def connection(*args, **kwargs):
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
         )
     else:
-        password = None
-        username_dn = None
+        connection_kwargs["password"] = None
+        connection_kwargs["user"] = None
+
     # Make the connection.
-    with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
+    with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), **connection_kwargs) as c:
 
         if settings.LDAP_AUTH_USE_TLS:
             c.start_tls()

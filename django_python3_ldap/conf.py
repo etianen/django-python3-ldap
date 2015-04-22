@@ -98,5 +98,17 @@ class LazySettings():
         default = "",
     )
 
+    # user for simple authentication
+    LDAP_AUTH_SIMPLEAUTH_USER = LazySetting(
+        name = "LDAP_AUTH_SIMPLEAUTH_USER",
+        default = "",
+    )
+
+    # password for simple authentication
+    LDAP_AUTH_SIMPLEAUTH_PASSWORD = LazySetting(
+        name = "LDAP_AUTH_SIMPLEAUTH_PASSWORD",
+        default = "",
+    )
+
 
 settings = LazySettings(settings)
