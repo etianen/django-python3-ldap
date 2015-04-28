@@ -2,6 +2,12 @@ django-python3-ldap changelog
 =============================
 
 
+0.9.3
+-----
+
+- Fixing broken python3-ldap dependency (@ricard33).
+
+
 0.9.2
 -----
 
