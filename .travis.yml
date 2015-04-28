@@ -6,7 +6,8 @@ python:
   - 3.4
 env:
   matrix:
-    - DJANGO=django==1.7.3
+    - DJANGO=django==1.7.7
+    - DJANGO=django==1.8
   global:
     # LDAP_AUTH_URL
     - secure: "YNnYSUnzs5XPS+f8sV0f4nTK/nmjgA2LUFIEznkI3b9F/d41w2RhvCI+S6cCo7VX8POdomUSKpIjWobBdQKWbO2nq7vsgjJdkSX0d9Wy19eiwSADSOALpuMbDMGXp9uI3H6mC3oPKES1upTaPKdpPQwa/8+7+h5QorEt2gHlZH0="
