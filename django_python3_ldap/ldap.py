@@ -41,6 +41,9 @@ class Connection(object):
             for field_name, attribute_name
             in settings.LDAP_AUTH_USER_FIELDS.items()
         }
+        if hasattr(User, 'ldap_auth_mod_hook'):
+            return User.ldap_auth_mod_hook(user_fields)
+
         user_data = settings.LDAP_AUTH_CLEAN_USER_DATA(user_fields)
         # Create the user lookup.
         user_lookup = {
