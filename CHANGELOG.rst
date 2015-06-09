@@ -2,6 +2,13 @@ django-python3-ldap changelog
 =============================
 
 
+0.9.4
+-----
+
+- Fixing broken ldap3 dependency (@levisaya).
+- Honoring LDAP_AUTH_CLEAN_USER_DATA setting (@etianen, @akaariai).
+
+
 0.9.3
 -----
 
