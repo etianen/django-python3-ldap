@@ -144,18 +144,18 @@ def connection(*args, **kwargs):
         password = None
         username_dn = None
     # Make the connection.
-    with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=ldap3.AUTO_BIND_NONE) as c:
-
+    if user_identifier:
         if settings.LDAP_AUTH_USE_TLS:
-            c.start_tls()
-
-        # Attempt authentication, if required.
-        if user_identifier and not c.bind():
-            yield None
+            auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
         else:
-            # We authenticated, so let's return the connection.
-            auth_connection = Connection(c)
-            yield auth_connection
+            auto_bind = ldap3.AUTO_BIND_NO_TLS
+    else:
+        auto_bind = ldap3.AUTO_BIND_NONE
+    try:
+        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=auto_bind) as c:
+            yield Connection(c)
+    except ldap3.LDAPBindError:
+        yield None
 
 
 def authenticate(*args, **kwargs):

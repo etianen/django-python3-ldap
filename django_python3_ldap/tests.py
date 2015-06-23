@@ -127,6 +127,15 @@ class TestLdap(TestCase):
         # Ensure that the user isn't recreated on second access.
         self.assertEqual(user_1.pk, user_2.pk)
 
+    def testAuthenticateWithTLS(self):
+        with self.settings(LDAP_AUTH_USE_TLS=True):
+            user = authenticate(
+                username = settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
+
     # User syncronisation.
 
     def testSyncUsersCreatesUsers(self):
