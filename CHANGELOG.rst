@@ -2,6 +2,12 @@ django-python3-ldap changelog
 =============================
 
 
+0.9.5
+-----
+
+- Fixing security vulnerability where username and password could be transmitted in plain text before starting TLS (reported by Weitzhofer Bernhard).
+
+
 0.9.4
 -----
 
