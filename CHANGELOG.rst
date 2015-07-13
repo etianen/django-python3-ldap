@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.9.6
+-----
+
+- Added settings option for a username and password to be specified incase anonymous user queries are not allowed
+
 
 0.9.5
 -----
