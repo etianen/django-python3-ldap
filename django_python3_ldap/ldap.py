@@ -141,8 +141,8 @@ def connection(*args, **kwargs):
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
         )
     else:
-        password = None
-        username_dn = None
+        username_dn = settings.LDAP_AUTH_CONNECTION_USERNAME
+        password = settings.LDAP_AUTH_CONNECTION_PASSWORD
     # Make the connection.
     if user_identifier:
         if settings.LDAP_AUTH_USE_TLS:

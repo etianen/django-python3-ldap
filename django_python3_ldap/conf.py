@@ -98,5 +98,17 @@ class LazySettings():
         default = "",
     )
 
+    # A username to perform ldap_sync_users
+    LDAP_AUTH_CONNECTION_USERNAME = LazySetting(
+        name = "LDAP_AUTH_CONNECTION_USERNAME",
+        default = None,
+    )
+
+    # A password to perform ldap_sync_users
+    LDAP_AUTH_CONNECTION_PASSWORD = LazySetting(
+        name = "LDAP_AUTH_CONNECTION_PASSWORD",
+        default = None,
+    )
+
 
 settings = LazySettings(settings)

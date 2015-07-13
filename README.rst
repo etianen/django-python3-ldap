@@ -39,6 +39,11 @@ Available settings
 
     # The LDAP class that represents a user.
     LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
+    
+    # The LDAP Username and password of a user so ldap_sync_users can be run
+    # Set to None if you allow anonymous queries
+    LDAP_AUTH_CONNECTION_USERNAME = None
+    LDAP_AUTH_CONNECTION_PASSWORD = None
 
     # User model fields mapped to the LDAP
     # attributes that represent them.
@@ -75,7 +80,7 @@ the advantage of allowing you to assign permissions and groups to the existing u
 admin interface.
 
 Running ``ldap_sync_users`` as a background cron task is another optional way to
-keep all users in sync on a regular basis. 
+keep all users in sync on a regular basis.
 
 
 Support and announcements
@@ -84,13 +89,13 @@ Support and announcements
 Downloads and bug tracking can be found at the `main project
 website <http://github.com/etianen/django-python3-ldap>`_.
 
-    
+
 More information
 ----------------
 
 The django-python3-ldap project was developed by Dave Hall. You can get the code
 from the `django-python3-ldap project site <http://github.com/etianen/django-python3-ldap>`_.
-    
+
 Dave Hall is a freelance web developer, based in Cambridge, UK. You can usually
 find him on the Internet in a number of different places:
 
