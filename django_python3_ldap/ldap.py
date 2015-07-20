@@ -53,6 +53,8 @@ class Connection(object):
             defaults = user_fields,
             **user_lookup
         )
+        # save ldap attributes for backend
+        setattr(user, 'ldap_data', user_data)
         # All done!
         return user
 
@@ -105,7 +107,7 @@ class Connection(object):
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
             search_filter = search_filter,
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = list(settings.LDAP_AUTH_USER_FIELDS.values()),
+            attributes = ldap3.ALL_ATTRIBUTES,
             size_limit = 1,
         ):
             return self._get_or_create_user(self._connection.response[0])
