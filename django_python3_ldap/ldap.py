@@ -154,7 +154,7 @@ def connection(*args, **kwargs):
     try:
         with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=auto_bind) as c:
             yield Connection(c)
-    except ldap3.LDAPBindError, ldap3.LDAPSASLPrepError:
+    except (ldap3.LDAPBindError, ldap3.LDAPSASLPrepError):
         yield None
 
 
