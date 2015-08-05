@@ -17,7 +17,7 @@ def clean_ldap_name(name):
     # values, but I can't find the documentation anywhere!
     # This just removes bad characters entirely, which will
     # work for most cases, but isn't exactly ideal! :O
-    return re.sub("[^a-zA-Z0-9_\-]", "", force_text(name))
+    return re.sub("[^a-zA-Z0-9_\-.]", "", force_text(name))
 
 
 def clean_user_data(user_data):
