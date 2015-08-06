@@ -129,19 +129,9 @@ def connection(*args, **kwargs):
     # Format the DN for the username.
     if user_identifier:
         password = user_identifier.pop("password")
-        username_dn = "{user_identifier},{search_base}".format(
-            user_identifier = ",".join(
-                "{attribute_name}={field_value}".format(
-                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
-                    field_value = clean_ldap_name(field_value),
-                )
-                for field_name, field_value
-                in user_identifier.items()
-            ),
-            search_base = settings.LDAP_AUTH_SEARCH_BASE,
-        )
+        username = settings.LDAP_AUTH_FORMAT_USERNAME(user_identifier, settings.LDAP_AUTH_USER_FIELDS)
     else:
-        username_dn = settings.LDAP_AUTH_CONNECTION_USERNAME
+        username = settings.LDAP_AUTH_CONNECTION_USERNAME
         password = settings.LDAP_AUTH_CONNECTION_PASSWORD
     # Make the connection.
     if user_identifier:
@@ -152,7 +142,7 @@ def connection(*args, **kwargs):
     else:
         auto_bind = ldap3.AUTO_BIND_NONE
     try:
-        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username_dn, password=password, auto_bind=auto_bind) as c:
+        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username, password=password, auto_bind=auto_bind) as c:
             yield Connection(c)
     except (ldap3.LDAPBindError, ldap3.LDAPSASLPrepError):
         yield None
