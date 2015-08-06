@@ -68,6 +68,18 @@ Available settings
     LDAP_AUTH_FORMAT_USERNAME = django_python3_ldap.utils.format_username_openldap
 
 
+Microsoft Active Directory support
+----------------------------------
+
+django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
+a Microsoft Active Directory, add the following lines to your settings file.
+
+::
+
+    import django_python3_ldap.utils.format_username_active_directory
+    LDAP_AUTH_FORMAT_USERNAME = django_python3_ldap.utils.format_username_active_directory
+
+
 How it works
 ------------
 
@@ -85,18 +97,6 @@ admin interface.
 
 Running ``ldap_sync_users`` as a background cron task is another optional way to
 keep all users in sync on a regular basis.
-
-
-Microsoft Active Directory support
-----------------------------------
-
-django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
-a Microsoft Active Directory, add the following lines to your settings file.
-
-::
-
-    import django_python3_ldap.utils.format_username_active_directory
-    LDAP_AUTH_FORMAT_USERNAME = django_python3_ldap.utils.format_username_active_directory
 
 
 Support and announcements
