@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.test import TestCase
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.conf import settings as django_settings
 from django.core.management import call_command, CommandError
 
@@ -100,7 +100,7 @@ class TestLdap(TestCase):
         )
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
-        
+
     def testAuthenticateUserBadUsername(self):
         user = authenticate(
             username = "bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
@@ -174,3 +174,26 @@ class TestLdap(TestCase):
     def testPromoteMissingUser(self):
         with self.assertRaises(CommandError, msg="User with username missing_user does not exist") as cm:
             call_command("ldap_promote", "missing_user", verbosity=0)
+
+    def testSyncUserRelations(self):
+        def check_sync_user_relation(user, data):
+            # id have been created
+            self.assertIsNotNone(user.id)
+            # model is saved
+            self.assertEqual(user.username, User.objects.get(pk=user.id).username)
+            # save all groups
+            self.assertIn('cn', data)
+            groups = list()
+            ldap_groups = list(data.get('memberOf', ()))
+            ldap_groups.append('default_group')
+            for group in ldap_groups:
+                user.groups.create(name=group)
+
+        with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS=check_sync_user_relation):
+            user = authenticate(
+                username = settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertGreaterEqual(user.groups.count(), 1)
+            self.assertEqual(user.groups.filter(name='default_group').count(), 1)
