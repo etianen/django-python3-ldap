@@ -4,7 +4,7 @@ Settings used by django-python3.
 
 from django.conf import settings
 
-from django_python3_ldap.utils import clean_user_data
+from django_python3_ldap.utils import clean_user_data, sync_user_relations
 
 
 class LazySetting():
@@ -84,6 +84,11 @@ class LazySettings():
     LDAP_AUTH_CLEAN_USER_DATA = LazySetting(
         name = "LDAP_AUTH_CLEAN_USER_DATA",
         default = clean_user_data,
+    )
+
+    LDAP_AUTH_SYNC_USER_RELATIONS = LazySetting(
+        name = "LDAP_AUTH_SYNC_USER_RELATIONS",
+        default = sync_user_relations
     )
 
     # A username to use when running the live LDAP tests.
