@@ -1,14 +1,18 @@
+# encoding=utf-8
+from __future__ import unicode_literals
+
 from unittest import skipUnless
 from io import StringIO
 
 from django.test import TestCase
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.conf import settings as django_settings
 from django.core.management import call_command, CommandError
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
+from django_python3_ldap.utils import clean_ldap_name
 
 
 @skipUnless(settings.LDAP_AUTH_TEST_USER_USERNAME, "No settings.LDAP_AUTH_TEST_USER_USERNAME supplied.")
@@ -29,6 +33,12 @@ class TestLdap(TestCase):
     def testLazySettingsClassLookup(self):
         self.assertEqual(settings.__class__.LDAP_AUTH_TEST_USER_USERNAME.name, "LDAP_AUTH_TEST_USER_USERNAME")
         self.assertEqual(settings.__class__.LDAP_AUTH_TEST_USER_USERNAME.default, "")
+
+    # Utils tests.
+
+    def testCleanLdapName(self):
+        self.assertEqual(clean_ldap_name("foo@bar.com"), r'foo@bar.com')
+        self.assertEqual(clean_ldap_name("café"), r'caf\E9')
 
     # LDAP tests.
 
