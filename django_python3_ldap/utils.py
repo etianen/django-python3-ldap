@@ -30,6 +30,11 @@ def clean_user_data(user_data):
     return user_data
 
 
+def sync_user_relations(user, ldap_data):
+    # do nothing by default
+    pass
+
+
 def resolve_user_identifier(lookup_fields, required, args, kwargs):
     """
     Resolves a user identifier from the given args
