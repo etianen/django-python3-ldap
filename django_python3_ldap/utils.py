@@ -6,6 +6,7 @@ import re, binascii
 
 from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
+from django.utils.module_loading import import_string
 
 
 def clean_ldap_name(name):
@@ -63,3 +64,14 @@ def resolve_user_identifier(lookup_fields, required, args, kwargs):
         raise_error()
     # All done!
     return {}
+
+
+def import_func(func):
+    """
+    imports function if it's not already imported
+    """
+    if callable(func):
+        return func
+    elif isinstance(func, str):
+        return import_string(func)
+    raise AttributeError("It's not a function {0!r}".format(func))
