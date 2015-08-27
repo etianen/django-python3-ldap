@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from django.contrib.auth import get_user_model
 
 from django_python3_ldap.conf import settings
-from django_python3_ldap.utils import clean_ldap_name, resolve_user_identifier
+from django_python3_ldap.utils import clean_ldap_name, resolve_user_identifier, import_func
 
 
 class Connection(object):
@@ -41,7 +41,7 @@ class Connection(object):
             for field_name, attribute_name
             in settings.LDAP_AUTH_USER_FIELDS.items()
         }
-        user_fields = settings.LDAP_AUTH_CLEAN_USER_DATA(user_fields)
+        user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
         # Create the user lookup.
         user_lookup = {
             field_name: user_fields.pop(field_name, "")
@@ -54,7 +54,7 @@ class Connection(object):
             **user_lookup
         )
         # Update relations
-        settings.LDAP_AUTH_SYNC_USER_RELATIONS(user, attributes)
+        import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
 
         # All done!
         return user

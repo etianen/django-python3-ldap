@@ -12,7 +12,7 @@ from django.core.management import call_command, CommandError
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
-from django_python3_ldap.utils import clean_ldap_name
+from django_python3_ldap.utils import clean_ldap_name, import_func
 
 
 @skipUnless(settings.LDAP_AUTH_TEST_USER_USERNAME, "No settings.LDAP_AUTH_TEST_USER_USERNAME supplied.")
@@ -207,3 +207,15 @@ class TestLdap(TestCase):
             self.assertIsInstance(user, User)
             self.assertGreaterEqual(user.groups.count(), 1)
             self.assertEqual(user.groups.filter(name='default_group').count(), 1)
+
+    def testImportFunc(self):
+        self.assertIs(clean_ldap_name, import_func(clean_ldap_name))
+        self.assertIs(clean_ldap_name, import_func('django_python3_ldap.utils.clean_ldap_name'))
+        self.assertTrue(callable(import_func('django.contrib.auth.get_user_model')))
+
+        self.assertRaises(AttributeError, import_func, 123)
+
+        self.assertTrue(callable(import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)))
+
+        with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS='django.contrib.auth.get_user_model'):
+            self.assertTrue(callable(import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)))

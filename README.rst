@@ -57,17 +57,17 @@ Available settings
     # A tuple of fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 
-    # Callable that transforms the user data loaded from
+    # Dotted path to callable that transforms the user data loaded from
     # LDAP into a form suitable for creating a user.
     # Override this to set custom field formatting for your
     # user model.
-    LDAP_AUTH_CLEAN_USER_DATA = django_python3_ldap.utils.clean_user_data
+    LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
 
-    # Callable that can be used to store additional information
+    # Dotted path to callable that can be used to store additional information
     # from LDAP data to user-related models. For example,
     # it can be used to synchronize LDAP-groups with Django groups.
     # Takes two parameters: user object and dictionary of ldap data
-    LDAP_AUTH_SYNC_USER_RELATIONS = django_python3_ldap.utils.sync_user_relations
+    LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 
 
 How it works
