@@ -47,6 +47,12 @@ class LazySettings():
         default = False,
     )
 
+    # Initiate SSL on connection.
+    LDAP_AUTH_USE_SSL = LazySetting(
+        name = "LDAP_AUTH_USE_SSL",
+        default = False,
+    )
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = LazySetting(
         name = "LDAP_AUTH_SEARCH_BASE",
