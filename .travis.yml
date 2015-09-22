@@ -24,7 +24,7 @@ cache:
   directories:
     - $HOME/.pip-cache/
 install:
-  - travis_retry pip install $DJANGO coverage --download-cache $HOME/.pip-cache
+  - travis_retry pip install $DJANGO "coverage<4.0" --download-cache $HOME/.pip-cache
   - pip install -e . --download-cache $HOME/.pip-cache
 script:
   - coverage run tests/manage.py test django_python3_ldap
