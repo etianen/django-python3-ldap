@@ -3,6 +3,7 @@ Some useful LDAP utilities.
 """
 
 import re, binascii
+import six
 
 from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
@@ -72,6 +73,6 @@ def import_func(func):
     """
     if callable(func):
         return func
-    elif isinstance(func, str):
+    elif isinstance(func, six.string_types):
         return import_string(func)
     raise AttributeError("It's not a function {0!r}".format(func))

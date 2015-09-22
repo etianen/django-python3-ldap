@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 
 from unittest import skipUnless
-from io import StringIO
+from io import StringIO, BytesIO
+
+import six
 
 from django.test import TestCase
 from django.contrib.auth import authenticate
@@ -22,7 +24,7 @@ from django_python3_ldap.utils import clean_ldap_name, import_func
 class TestLdap(TestCase):
 
     def setUp(self):
-        super().setUp()
+        super(TestLdap, self).setUp()
         User.objects.all().delete()
 
     # Lazy settings tests.
@@ -153,12 +155,12 @@ class TestLdap(TestCase):
         self.assertGreater(User.objects.count(), 0)
 
     def testSyncUsersCommandOutput(self):
-        out = StringIO()
+        out = StringIO() if six.PY3 else BytesIO()
         call_command("ldap_sync_users", verbosity=1, stdout=out)
         rows = out.getvalue().split("\n")[:-1]
         self.assertEqual(len(rows), User.objects.count())
         for row in rows:
-            self.assertRegex(row, r'^Synced [^\s]+$')
+            six.assertRegex(self, row, r'^Synced [^\s]+$')
 
     def testReSyncUsersDoesntRecreateUsers(self):
         call_command("ldap_sync_users", verbosity=0)
@@ -176,7 +178,7 @@ class TestLdap(TestCase):
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         # Promote the user.
-        call_command("ldap_promote", "test", stdout=StringIO())
+        call_command("ldap_promote", "test", stdout=StringIO() if six.PY3 else BytesIO())
         user = User.objects.get(username="test")
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
