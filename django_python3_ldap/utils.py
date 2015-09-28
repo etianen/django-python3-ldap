@@ -3,11 +3,11 @@ Some useful LDAP utilities.
 """
 
 import re, binascii
-import six
 
 from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
+from django.utils import six
 
 
 def clean_ldap_name(name):

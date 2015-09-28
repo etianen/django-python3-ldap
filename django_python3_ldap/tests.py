@@ -4,13 +4,12 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 from io import StringIO, BytesIO
 
-import six
-
 from django.test import TestCase
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.conf import settings as django_settings
 from django.core.management import call_command, CommandError
+from django.utils import six
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
