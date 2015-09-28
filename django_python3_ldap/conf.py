@@ -71,6 +71,12 @@ class LazySettings(object):
         },
     )
 
+    # active directory domain name
+    LDAP_ACTIVEDIRECTORY_DOMAIN_NAME = LazySetting(
+        name = "LDAP_ACTIVEDIRECTORY_DOMAIN_NAME",
+        default = None,
+    )
+
     # A tuple of fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = LazySetting(
         name = "LDAP_AUTH_USER_LOOKUP_FIELDS",
