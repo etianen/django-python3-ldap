@@ -7,6 +7,7 @@ import re, binascii
 from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
+from django.utils import six
 
 
 def clean_ldap_name(name):
@@ -72,6 +73,6 @@ def import_func(func):
     """
     if callable(func):
         return func
-    elif isinstance(func, str):
+    elif isinstance(func, six.string_types):
         return import_string(func)
     raise AttributeError("It's not a function {0!r}".format(func))

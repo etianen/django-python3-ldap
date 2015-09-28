@@ -7,7 +7,7 @@ from django.conf import settings
 from django_python3_ldap.utils import clean_user_data, sync_user_relations
 
 
-class LazySetting():
+class LazySetting(object):
 
     """
     A proxy to a named Django setting.
@@ -23,7 +23,7 @@ class LazySetting():
         return getattr(obj._settings, self.name, self.default)
 
 
-class LazySettings():
+class LazySettings(object):
 
     """
     A proxy to ldap-specific django settings.
