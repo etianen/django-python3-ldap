@@ -132,17 +132,23 @@ def connection(*args, **kwargs):
     # Format the DN for the username.
     if user_identifier:
         password = user_identifier.pop("password")
-        username_dn = "{user_identifier},{search_base}".format(
-            user_identifier = ",".join(
-                "{attribute_name}={field_value}".format(
-                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
-                    field_value = clean_ldap_name(field_value),
-                )
-                for field_name, field_value
-                in user_identifier.items()
-            ),
-            search_base = settings.LDAP_AUTH_SEARCH_BASE,
-        )
+        if settings.LDAP_ACTIVEDIRECTORY_DOMAIN_NAME:
+            username_dn = "{domain_name}\\{user_name}".format(
+                domain_name = settings.LDAP_ACTIVEDIRECTORY_DOMAIN_NAME,
+                user_name = user_identifier["username"],
+            )
+        else:
+            username_dn = "{user_identifier},{search_base}".format(
+                user_identifier = ",".join(
+                    "{attribute_name}={field_value}".format(
+                        attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
+                        field_value = clean_ldap_name(field_value),
+                    )
+                    for field_name, field_value
+                    in user_identifier.items()
+                ),
+                search_base = settings.LDAP_AUTH_SEARCH_BASE,
+            )
     else:
         username_dn = settings.LDAP_AUTH_CONNECTION_USERNAME
         password = settings.LDAP_AUTH_CONNECTION_PASSWORD

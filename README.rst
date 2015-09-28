@@ -57,6 +57,9 @@ Available settings
     # A tuple of fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 
+    # Optional active directory domain name (default is None)
+    LDAP_ACTIVEDIRECTORY_DOMAIN_NAME = "domain"
+
     # Dotted path to callable that transforms the user data loaded from
     # LDAP into a form suitable for creating a user.
     # Override this to set custom field formatting for your
