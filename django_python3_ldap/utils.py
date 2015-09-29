@@ -2,11 +2,13 @@
 Some useful LDAP utilities.
 """
 
-import re
+import re, binascii
 
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.utils.encoding import force_text
+from django.utils.module_loading import import_string
+from django.utils import six
 
 
 def clean_ldap_name(name):
@@ -14,11 +16,7 @@ def clean_ldap_name(name):
     Transforms the given name into a form that
     won't interfere with LDAP queries.
     """
-    # HACK: There is probably an official way to escape LDAP
-    # values, but I can't find the documentation anywhere!
-    # This just removes bad characters entirely, which will
-    # work for most cases, but isn't exactly ideal! :O
-    return re.sub("[^a-zA-Z0-9_\-]", "", force_text(name))
+    return re.sub(r'[^a-zA-Z0-9 _\-.@]', lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(), force_text(name))
 
 
 def clean_user_data(user_data):
@@ -57,6 +55,11 @@ def format_username_active_directory(user_identifier, user_field_mapping):
     return user_identifier["username"]
 
 
+def sync_user_relations(user, ldap_data):
+    # do nothing by default
+    pass
+
+
 def resolve_user_identifier(lookup_fields, required, args, kwargs):
     """
     Resolves a user identifier from the given args
@@ -89,3 +92,14 @@ def resolve_user_identifier(lookup_fields, required, args, kwargs):
         raise_error()
     # All done!
     return {}
+
+
+def import_func(func):
+    """
+    imports function if it's not already imported
+    """
+    if callable(func):
+        return func
+    elif isinstance(func, six.string_types):
+        return import_string(func)
+    raise AttributeError("It's not a function {0!r}".format(func))

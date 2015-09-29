@@ -4,10 +4,10 @@ Settings used by django-python3.
 
 from django.conf import settings
 
-from django_python3_ldap.utils import clean_user_data, format_username_openldap
+from django_python3_ldap.utils import clean_user_data, sync_user_relations, format_username_openldap
 
 
-class LazySetting():
+class LazySetting(object):
 
     """
     A proxy to a named Django setting.
@@ -23,7 +23,7 @@ class LazySetting():
         return getattr(obj._settings, self.name, self.default)
 
 
-class LazySettings():
+class LazySettings(object):
 
     """
     A proxy to ldap-specific django settings.
@@ -84,6 +84,13 @@ class LazySettings():
     LDAP_AUTH_CLEAN_USER_DATA = LazySetting(
         name = "LDAP_AUTH_CLEAN_USER_DATA",
         default = clean_user_data,
+    )
+
+    # Callable that can be used to store additional information
+    # from LDAP data to user-related models
+    LDAP_AUTH_SYNC_USER_RELATIONS = LazySetting(
+        name = "LDAP_AUTH_SYNC_USER_RELATIONS",
+        default = sync_user_relations
     )
 
     # Formats a user's login information to a form suitable
