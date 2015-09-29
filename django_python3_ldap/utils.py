@@ -5,10 +5,11 @@ Some useful LDAP utilities.
 import re, binascii
 
 from django.contrib.auth.hashers import make_password
-from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils import six
+
+from django_python3_ldap.conf import settings
 
 
 def clean_ldap_name(name):
@@ -29,7 +30,7 @@ def clean_user_data(user_data):
     return user_data
 
 
-def format_username_openldap(user_identifier, user_field_mapping):
+def format_username_openldap(user_identifier):
     """
     Formats a user identifier into a username suitable for
     binding to an OpenLDAP server.
@@ -37,7 +38,7 @@ def format_username_openldap(user_identifier, user_field_mapping):
     return "{user_identifier},{search_base}".format(
         user_identifier = ",".join(
             "{attribute_name}={field_value}".format(
-                attribute_name = clean_ldap_name(user_field_mapping[field_name]),
+                attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
                 field_value = clean_ldap_name(field_value),
             )
             for field_name, field_value
@@ -47,7 +48,7 @@ def format_username_openldap(user_identifier, user_field_mapping):
     )
 
 
-def format_username_active_directory(user_identifier, user_field_mapping):
+def format_username_active_directory(user_identifier):
     """
     Formats a user identifier into a username suitable for
     binding to an Active Directory server.

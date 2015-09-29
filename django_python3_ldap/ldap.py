@@ -132,7 +132,7 @@ def connection(*args, **kwargs):
     # Format the DN for the username.
     if user_identifier:
         password = user_identifier.pop("password")
-        username = settings.LDAP_AUTH_FORMAT_USERNAME(user_identifier, settings.LDAP_AUTH_USER_FIELDS)
+        username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)(user_identifier)
     else:
         username = settings.LDAP_AUTH_CONNECTION_USERNAME
         password = settings.LDAP_AUTH_CONNECTION_PASSWORD
