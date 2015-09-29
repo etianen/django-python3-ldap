@@ -26,7 +26,7 @@ Installation
 Available settings
 ------------------
 
-::
+.. code:: python
 
     # The URL of the LDAP server.
     LDAP_AUTH_URL = "ldap://localhost:389"
@@ -85,14 +85,14 @@ Microsoft Active Directory support
 django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
 a Microsoft Active Directory, add the following line to your settings file.
 
-::
+.. code:: python
 
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
 
 If your Active Directory server requires a domain to be supplied with the username,
 then also specify:
 
-::
+.. code:: python
 
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
 
