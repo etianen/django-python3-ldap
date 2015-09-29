@@ -53,7 +53,13 @@ def format_username_active_directory(user_identifier):
     Formats a user identifier into a username suitable for
     binding to an Active Directory server.
     """
-    return user_identifier["username"]
+    username = user_identifier["username"]
+    if settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN:
+        username = "{domain}\\{username}".format(
+            domain = settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
+            username = username,
+        )
+    return username
 
 
 def sync_user_relations(user, ldap_data):

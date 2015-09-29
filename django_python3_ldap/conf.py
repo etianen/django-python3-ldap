@@ -98,6 +98,14 @@ class LazySettings(object):
         default = "django_python3_ldap.utils.format_username_openldap",
     )
 
+    # The domain used to authenticate the active directory user.
+    # Should be used in combination with
+    # LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = LazySetting(
+        name = "LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN",
+        default = None,
+    )
+
     # A username to use when running the live LDAP tests.
     LDAP_AUTH_TEST_USER_USERNAME = LazySetting(
         name = "LDAP_AUTH_TEST_USER_USERNAME",

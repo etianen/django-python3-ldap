@@ -40,11 +40,6 @@ Available settings
     # The LDAP class that represents a user.
     LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
 
-    # The LDAP Username and password of a user so ldap_sync_users can be run
-    # Set to None if you allow anonymous queries
-    LDAP_AUTH_CONNECTION_USERNAME = None
-    LDAP_AUTH_CONNECTION_PASSWORD = None
-
     # User model fields mapped to the LDAP
     # attributes that represent them.
     LDAP_AUTH_USER_FIELDS = {
@@ -69,21 +64,37 @@ Available settings
     # Takes two parameters: user object and dictionary of ldap data
     LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 
+    # The LDAP Username and password of a user so ldap_sync_users can be run
+    # Set to None if you allow anonymous queries
+    LDAP_AUTH_CONNECTION_USERNAME = None
+    LDAP_AUTH_CONNECTION_PASSWORD = None
+
     # Formats a user's login information to a form suitable
     # for binding as a username to the LDAP server.
-    LDAP_AUTH_FORMAT_USERNAME = django_python3_ldap.utils.format_username_openldap
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
+
+    # Sets the login domain for Active Directory users.
+    # Should be used in combination with
+    # LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 
 
 Microsoft Active Directory support
 ----------------------------------
 
 django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
-a Microsoft Active Directory, add the following lines to your settings file.
+a Microsoft Active Directory, add the following line to your settings file.
 
 ::
 
-    import django_python3_ldap.utils.format_username_active_directory
-    LDAP_AUTH_FORMAT_USERNAME = django_python3_ldap.utils.format_username_active_directory
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+
+If your Active Directory server requires a domain to be supplied with the username,
+then also specify:
+
+::
+
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
 
 
 How it works
