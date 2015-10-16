@@ -93,7 +93,7 @@ class Connection(object):
         # Parse the user lookup.
         user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS, True, args, kwargs)
         # Search the LDAP database.
-        search_filter = "(&(objectClass={object_class}){user_identifier})".format(
+        search_filter = "(&(objectClass={object_class}){user_identifier}{extra_filter})".format(
             object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
             user_identifier = "".join(
                 "({attribute_name}={field_value})".format(
@@ -103,12 +103,14 @@ class Connection(object):
                 for field_name, field_value
                 in user_identifier.items()
             ),
+            extra_filter = settings.LDAP_AUTH_SEARCH_EXTRA_FILTER,
         )
         if self._connection.search(
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
             search_filter = search_filter,
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
             attributes = ldap3.ALL_ATTRIBUTES,
+            get_operational_attributes = True,
             size_limit = 1,
         ):
             return self._get_or_create_user(self._connection.response[0])

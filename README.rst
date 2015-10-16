@@ -40,6 +40,9 @@ Available settings
     # The LDAP class that represents a user.
     LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
 
+    # Extra LDAP search filter for matching users.
+    LDAP_AUTH_SEARCH_EXTRA_FILTER = ""
+
     # The LDAP Username and password of a user so ldap_sync_users can be run
     # Set to None if you allow anonymous queries
     LDAP_AUTH_CONNECTION_USERNAME = None
