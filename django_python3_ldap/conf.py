@@ -59,6 +59,12 @@ class LazySettings(object):
         default = "inetOrgPerson",
     )
 
+    # Extra search filter for matching users.
+    LDAP_AUTH_SEARCH_EXTRA_FILTER = LazySetting(
+        name = "LDAP_AUTH_SEARCH_EXTRA_FILTER",
+        default = "",
+    )
+
     # User model fields mapped to the LDAP
     # attributes that represent them.
     LDAP_AUTH_USER_FIELDS = LazySetting(
