@@ -49,34 +49,39 @@ Available settings
         "email": "mail",
     }
 
-    # A tuple of fields used to uniquely identify a user.
+    # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 
-    # Dotted path to callable that transforms the user data loaded from
-    # LDAP into a form suitable for creating a user.
-    # Override this to set custom field formatting for your
-    # user model.
+    # Path to a callable that takes a dict of {model_field_name: value},
+    # returning a dict of clean model data.
+    # Use this to customize how data loaded from LDAP is saved to the User model.
     LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
 
-    # Dotted path to callable that can be used to store additional information
-    # from LDAP data to user-related models. For example,
-    # it can be used to synchronize LDAP-groups with Django groups.
-    # Takes two parameters: user object and dictionary of ldap data
+    # Path to a callable that takes a user model and a dict of {ldap_field_name: [value]},
+    # and saves any additional user relationships based on the LDAP data.
+    # Use this to customize how data loaded from LDAP is saved to User model relations.
+    # For customizing non-related User model fields, use LDAP_AUTH_CLEAN_USER_DATA.
     LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 
-    # The LDAP Username and password of a user so ldap_sync_users can be run
-    # Set to None if you allow anonymous queries
-    LDAP_AUTH_CONNECTION_USERNAME = None
-    LDAP_AUTH_CONNECTION_PASSWORD = None
+    # Path to a callable that takes a dict of {ldap_field_name: value},
+    # returning a dict of {ldap_field_name: field_value}.
+    # Use this to add any additional user lookup filters, such as `memberOf`.
+    LDAP_AUTH_CLEAN_SEARCH_DATA = "django_python3_ldap.utils.clean_search_data"
 
-    # Formats a user's login information to a form suitable
-    # for binding as a username to the LDAP server.
+    # Path to a callable that takes a dict of {model_field_name: value}, and returns
+    # a string of the username to bind to the LDAP server.
+    # Use this to support different types of LDAP server.
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
 
     # Sets the login domain for Active Directory users.
     # Should be used in combination with
     # LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
+
+    # The LDAP username and password of a user for authenticating the `ldap_sync_users`
+    # management command. Set to None if you allow anonymous queries.
+    LDAP_AUTH_CONNECTION_USERNAME = None
+    LDAP_AUTH_CONNECTION_PASSWORD = None
 
 
 Microsoft Active Directory support

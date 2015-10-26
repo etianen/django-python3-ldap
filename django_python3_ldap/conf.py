@@ -84,6 +84,13 @@ class LazySettings(object):
         default = "django_python3_ldap.utils.clean_user_data",
     )
 
+    # Transforms the user's login information into a form
+    # suitable for filtering the user in the LDAP server.
+    LDAP_AUTH_CLEAN_SEARCH_DATA = LazySetting(
+        name = "LDAP_AUTH_CLEAN_SEARCH_DATA",
+        default = "django_python3_ldap.utils.clean_search_data",
+    )
+
     # Callable that can be used to store additional information
     # from LDAP data to user-related models
     LDAP_AUTH_SYNC_USER_RELATIONS = LazySetting(

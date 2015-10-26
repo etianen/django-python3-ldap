@@ -12,6 +12,14 @@ from django.utils import six
 from django_python3_ldap.conf import settings
 
 
+def import_func(func):
+    if callable(func):
+        return func
+    elif isinstance(func, six.string_types):
+        return import_string(func)
+    raise AttributeError("Expected a function {0!r}".format(func))
+
+
 def clean_ldap_name(name):
     """
     Transforms the given name into a form that
@@ -20,17 +28,46 @@ def clean_ldap_name(name):
     return re.sub(r'[^a-zA-Z0-9 _\-.@]', lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(), force_text(name))
 
 
-def clean_user_data(user_data):
+def convert_model_fields_to_ldap_fields(model_fields):
+    """
+    Converts a set of model fields into a set of corresponding
+    LDAP fields.
+    """
+    return {
+        settings.LDAP_AUTH_USER_FIELDS[field_name]: field_value
+        for field_name, field_value
+        in model_fields.items()
+    }
+
+
+def format_search_filter(model_fields):
+    """
+    Creates an LDAP search filter for the given set of model
+    fields.
+    """
+    return "(&{user_identifier})".format(
+        user_identifier = "".join(
+            "({attribute_name}={field_value})".format(
+                attribute_name = clean_ldap_name(field_name),
+                field_value = clean_ldap_name(field_value),
+            )
+            for field_name, field_value
+            in import_func(settings.LDAP_AUTH_CLEAN_SEARCH_DATA)(convert_model_fields_to_ldap_fields(model_fields)).items()
+        ),
+    )
+
+
+def clean_user_data(model_fields):
     """
     Transforms the user data loaded from
     LDAP into a form suitable for creating a user.
     """
     # Create an unusable password for the user.
-    user_data["password"] = make_password(None)
-    return user_data
+    model_fields["password"] = make_password(None)
+    return model_fields
 
 
-def format_username_openldap(user_identifier):
+def format_username_openldap(model_fields):
     """
     Formats a user identifier into a username suitable for
     binding to an OpenLDAP server.
@@ -38,22 +75,22 @@ def format_username_openldap(user_identifier):
     return "{user_identifier},{search_base}".format(
         user_identifier = ",".join(
             "{attribute_name}={field_value}".format(
-                attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
+                attribute_name = clean_ldap_name(field_name),
                 field_value = clean_ldap_name(field_value),
             )
             for field_name, field_value
-            in user_identifier.items()
+            in convert_model_fields_to_ldap_fields(model_fields).items()
         ),
         search_base = settings.LDAP_AUTH_SEARCH_BASE,
     )
 
 
-def format_username_active_directory(user_identifier):
+def format_username_active_directory(model_fields):
     """
     Formats a user identifier into a username suitable for
     binding to an Active Directory server.
     """
-    username = user_identifier["username"]
+    username = model_fields["username"]
     if settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN:
         username = "{domain}\\{username}".format(
             domain = settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
@@ -62,51 +99,11 @@ def format_username_active_directory(user_identifier):
     return username
 
 
-def sync_user_relations(user, ldap_data):
+def sync_user_relations(user, ldap_attributes):
     # do nothing by default
     pass
 
 
-def resolve_user_identifier(lookup_fields, required, args, kwargs):
-    """
-    Resolves a user identifier from the given args
-    and kwargs.
-
-    If a user identifier is given, it should either be
-    keyword arguments, or positional arguments that match the fields in
-    settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
-    """
-    # Raises a type error if the args are incorrect.
-    def raise_error():
-        raise TypeError("Expected arguments: {lookup_fields}".format(
-            lookup_fields = ", ".join(map(force_text, lookup_fields)),
-        ))
-    # Cannot use both args and kwargs.
-    if args and kwargs:
-        raise TypeError("Cannot use both args and kwargs to identify a user")
-    # Parse args.
-    if args:
-        if len(lookup_fields) != len(args):
-            raise_error()
-        return dict(zip(lookup_fields, args))
-    # Parse kwargs.
-    if kwargs:
-        if frozenset(lookup_fields) != frozenset(kwargs.keys()):
-            raise_error()
-        return kwargs.copy()
-    # No user identifier.
-    if required:
-        raise_error()
-    # All done!
-    return {}
-
-
-def import_func(func):
-    """
-    imports function if it's not already imported
-    """
-    if callable(func):
-        return func
-    elif isinstance(func, six.string_types):
-        return import_string(func)
-    raise AttributeError("It's not a function {0!r}".format(func))
+def clean_search_data(ldap_fields):
+    ldap_fields["objectClass"] = settings.LDAP_AUTH_OBJECT_CLASS
+    return ldap_fields

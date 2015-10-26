@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from django.contrib.auth import get_user_model
 
 from django_python3_ldap.conf import settings
-from django_python3_ldap.utils import clean_ldap_name, resolve_user_identifier, import_func
+from django_python3_ldap.utils import import_func, format_search_filter
 
 
 class Connection(object):
@@ -55,7 +55,6 @@ class Connection(object):
         )
         # Update relations
         import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
-
         # All done!
         return user
 
@@ -66,9 +65,7 @@ class Connection(object):
         """
         paged_entries = self._connection.extend.standard.paged_search(
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
-            search_filter = "(objectClass={object_class})".format(
-                object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
-            ),
+            search_filter = format_search_filter({}),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
             attributes = list(settings.LDAP_AUTH_USER_FIELDS.values()),
             paged_size = 30,
@@ -79,34 +76,17 @@ class Connection(object):
             in paged_entries
         )
 
-    def get_user(self, *args, **kwargs):
+    def get_user(self, **kwargs):
         """
         Returns the user with the given identifier.
 
-        The user identifier should either be keyword arguments,
-        or positional arguments that match the fields in
-        settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
-
-        For the default User model, this can therefor be in
-        the form `get_user(username)` or `get_user(username=username)`.
+        The user identifier should be keyword arguments matching the fields
+        in settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
         """
-        # Parse the user lookup.
-        user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS, True, args, kwargs)
         # Search the LDAP database.
-        search_filter = "(&(objectClass={object_class}){user_identifier})".format(
-            object_class = clean_ldap_name(settings.LDAP_AUTH_OBJECT_CLASS),
-            user_identifier = "".join(
-                "({attribute_name}={field_value})".format(
-                    attribute_name = clean_ldap_name(settings.LDAP_AUTH_USER_FIELDS[field_name]),
-                    field_value = clean_ldap_name(field_value),
-                )
-                for field_name, field_value
-                in user_identifier.items()
-            ),
-        )
         if self._connection.search(
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
-            search_filter = search_filter,
+            search_filter = format_search_filter(kwargs),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
             attributes = ldap3.ALL_ATTRIBUTES,
             size_limit = 1,
@@ -116,28 +96,21 @@ class Connection(object):
 
 
 @contextmanager
-def connection(*args, **kwargs):
+def connection(**kwargs):
     """
     Creates and returns a connection to the LDAP server.
 
-    If a user identifier is given, it should either be
-    keyword arguments, or positional arguments that match the fields in
-    settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
-
-    The final positional argument, or the keyword argument `password`, will
-    be taken as the user's password.
+    The user identifier, if given, should be keyword arguments matching the fields
+    in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
-    # Parse the user lookup.
-    user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS + ("password",), False, args, kwargs)
     # Format the DN for the username.
-    if user_identifier:
-        password = user_identifier.pop("password")
-        username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)(user_identifier)
-    else:
-        username = settings.LDAP_AUTH_CONNECTION_USERNAME
-        password = settings.LDAP_AUTH_CONNECTION_PASSWORD
+    username = None
+    password = None
+    if kwargs:
+        password = kwargs.pop("password")
+        username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)(kwargs)
     # Make the connection.
-    if user_identifier:
+    if username or password:
         if settings.LDAP_AUTH_USE_TLS:
             auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
         else:
@@ -151,21 +124,20 @@ def connection(*args, **kwargs):
         yield None
 
 
-def authenticate(*args, **kwargs):
+def authenticate(**kwargs):
     """
     Authenticates with the LDAP server, and returns
     the corresponding Django user instance.
 
-    The user identifier should either be
-    keyword arguments, or positional arguments that match the fields in
-    settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
-
-    The final positional argument, or the keyword argument `password`, will
-    be taken as the user's password.
+    The user identifier should be keyword arguments matching the fields
+    in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
-    user_identifier = resolve_user_identifier(settings.LDAP_AUTH_USER_LOOKUP_FIELDS + ("password",), True, args, kwargs)
-    user_identifier.pop("password")
-    with connection(*args, **kwargs) as c:
+    password = kwargs.pop("password")
+    # Check that this is valid login data.
+    if password is None or frozenset(kwargs.keys()) != frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS):
+        return None
+    # Connect to LDAP.
+    with connection(password=password, **kwargs) as c:
         if c is None:
             return None
-        return c.get_user(**user_identifier)
+        return c.get_user(**kwargs)
