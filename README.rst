@@ -82,11 +82,29 @@ Available settings
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
 
+Microsoft Active Directory support
+----------------------------------
+
+django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
+a Microsoft Active Directory, add the following line to your settings file.
+
+.. code:: python
+
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+
+If your Active Directory server requires a domain to be supplied with the username,
+then also specify:
+
+.. code:: python
+
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
+
+
 Custom user filters
 -------------------
 
-By default, any users within `LDAP_AUTH_SEARCH_BASE` and of the correct `LDAP_AUTH_OBJECT_CLASS`
-will be considered a valid user. You can apply further filtering by setting a custom `LDAP_AUTH_FORMAT_SEARCH_FILTERS`
+By default, any users within ``LDAP_AUTH_SEARCH_BASE`` and of the correct ``LDAP_AUTH_OBJECT_CLASS``
+will be considered a valid user. You can apply further filtering by setting a custom ``LDAP_AUTH_FORMAT_SEARCH_FILTERS``
 callable.
 
 .. code:: python
@@ -106,24 +124,6 @@ callable.
         search_filters.append("(|(memberOf=groupA)(memberOf=GroupB))")
         # All done!
         return search_filters
-
-
-Microsoft Active Directory support
-----------------------------------
-
-django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
-a Microsoft Active Directory, add the following line to your settings file.
-
-.. code:: python
-
-    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
-
-If your Active Directory server requires a domain to be supplied with the username,
-then also specify:
-
-.. code:: python
-
-    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
 
 
 How it works
