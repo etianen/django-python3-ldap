@@ -116,7 +116,7 @@ callable.
     from django_python3_ldap.utils import format_search_filters
 
     def custom_format_search_filters(ldap_fields):
-        # Add in simple filters to be AND'd onto the search filters.
+        # Add in simple filters.
         ldap_fields["memberOf"] = "foo"
         # Call the base format callable.
         search_filters = format_search_filters(ldap_fields)
@@ -124,6 +124,8 @@ callable.
         search_filters.append("(|(memberOf=groupA)(memberOf=GroupB))")
         # All done!
         return search_filters
+
+The returned list of search filters will be AND'd together to make the final search filter.
 
 
 How it works
