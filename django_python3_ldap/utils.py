@@ -45,16 +45,10 @@ def format_search_filter(model_fields):
     Creates an LDAP search filter for the given set of model
     fields.
     """
-    return "(&{user_identifier})".format(
-        user_identifier = "".join(
-            "({attribute_name}={field_value})".format(
-                attribute_name = clean_ldap_name(field_name),
-                field_value = clean_ldap_name(field_value),
-            )
-            for field_name, field_value
-            in import_func(settings.LDAP_AUTH_CLEAN_SEARCH_DATA)(convert_model_fields_to_ldap_fields(model_fields)).items()
-        ),
-    )
+    ldap_fields = convert_model_fields_to_ldap_fields(model_fields);
+    ldap_fields["objectClass"] = settings.LDAP_AUTH_OBJECT_CLASS
+    search_filters = import_func(settings.LDAP_AUTH_FORMAT_SEARCH_FILTERS)(ldap_fields)
+    return "(&({}))".format(")(".join(search_filters));
 
 
 def clean_user_data(model_fields):
@@ -104,6 +98,12 @@ def sync_user_relations(user, ldap_attributes):
     pass
 
 
-def clean_search_data(ldap_fields):
-    ldap_fields["objectClass"] = settings.LDAP_AUTH_OBJECT_CLASS
-    return ldap_fields
+def format_search_filters(ldap_fields):
+    return [
+        "{attribute_name}={field_value}".format(
+            attribute_name = clean_ldap_name(field_name),
+            field_value = clean_ldap_name(field_value),
+        )
+        for field_name, field_value
+        in ldap_fields.items()
+    ]

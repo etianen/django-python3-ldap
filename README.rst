@@ -64,9 +64,9 @@ Available settings
     LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 
     # Path to a callable that takes a dict of {ldap_field_name: value},
-    # returning a dict of {ldap_field_name: field_value}.
-    # Use this to add any additional user lookup filters, such as `memberOf`.
-    LDAP_AUTH_CLEAN_SEARCH_DATA = "django_python3_ldap.utils.clean_search_data"
+    # returning a list of [ldap_search_filter]. The search filters will then be AND'd
+    # together when creating the final search filter.
+    LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
 
     # Path to a callable that takes a dict of {model_field_name: value}, and returns
     # a string of the username to bind to the LDAP server.
@@ -74,14 +74,38 @@ Available settings
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
 
     # Sets the login domain for Active Directory users.
-    # Should be used in combination with
-    # LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 
     # The LDAP username and password of a user for authenticating the `ldap_sync_users`
     # management command. Set to None if you allow anonymous queries.
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
+
+
+Custom user filters
+-------------------
+
+By default, any users within `LDAP_AUTH_SEARCH_BASE` and of the correct `LDAP_AUTH_OBJECT_CLASS`
+will be considered a valid user. You can apply further filtering by setting a custom `LDAP_AUTH_FORMAT_SEARCH_FILTERS`
+callable.
+
+.. code:: python
+
+    # settings.py
+    LDAP_AUTH_FORMAT_SEARCH_FILTERS = "path.to.your.custom_format_search_filters"
+
+    # pay/to/your.py
+    from django_python3_ldap.utils import format_search_filters
+
+    def custom_format_search_filters(ldap_fields):
+        # Add in simple filters to be AND'd onto the search filters.
+        ldap_fields["memberOf"] = "foo"
+        # Call the base format callable.
+        search_filters = format_search_filters(ldap_fields)
+        # Advanced: apply custom LDAP filter logic.
+        search_filters.append("(|(memberOf=groupA)(memberOf=GroupB))")
+        # All done!
+        return search_filters
 
 
 Microsoft Active Directory support
