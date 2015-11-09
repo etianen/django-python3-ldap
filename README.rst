@@ -26,7 +26,7 @@ Installation
 Available settings
 ------------------
 
-::
+.. code:: python
 
     # The URL of the LDAP server.
     LDAP_AUTH_URL = "ldap://localhost:389"
@@ -40,11 +40,6 @@ Available settings
     # The LDAP class that represents a user.
     LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
 
-    # The LDAP Username and password of a user so ldap_sync_users can be run
-    # Set to None if you allow anonymous queries
-    LDAP_AUTH_CONNECTION_USERNAME = None
-    LDAP_AUTH_CONNECTION_PASSWORD = None
-
     # User model fields mapped to the LDAP
     # attributes that represent them.
     LDAP_AUTH_USER_FIELDS = {
@@ -54,20 +49,83 @@ Available settings
         "email": "mail",
     }
 
-    # A tuple of fields used to uniquely identify a user.
+    # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 
-    # Dotted path to callable that transforms the user data loaded from
-    # LDAP into a form suitable for creating a user.
-    # Override this to set custom field formatting for your
-    # user model.
+    # Path to a callable that takes a dict of {model_field_name: value},
+    # returning a dict of clean model data.
+    # Use this to customize how data loaded from LDAP is saved to the User model.
     LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
 
-    # Dotted path to callable that can be used to store additional information
-    # from LDAP data to user-related models. For example,
-    # it can be used to synchronize LDAP-groups with Django groups.
-    # Takes two parameters: user object and dictionary of ldap data
+    # Path to a callable that takes a user model and a dict of {ldap_field_name: [value]},
+    # and saves any additional user relationships based on the LDAP data.
+    # Use this to customize how data loaded from LDAP is saved to User model relations.
+    # For customizing non-related User model fields, use LDAP_AUTH_CLEAN_USER_DATA.
     LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
+
+    # Path to a callable that takes a dict of {ldap_field_name: value},
+    # returning a list of [ldap_search_filter]. The search filters will then be AND'd
+    # together when creating the final search filter.
+    LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
+
+    # Path to a callable that takes a dict of {model_field_name: value}, and returns
+    # a string of the username to bind to the LDAP server.
+    # Use this to support different types of LDAP server.
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
+
+    # Sets the login domain for Active Directory users.
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
+
+    # The LDAP username and password of a user for authenticating the `ldap_sync_users`
+    # management command. Set to None if you allow anonymous queries.
+    LDAP_AUTH_CONNECTION_USERNAME = None
+    LDAP_AUTH_CONNECTION_PASSWORD = None
+
+
+Microsoft Active Directory support
+----------------------------------
+
+django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
+a Microsoft Active Directory, add the following line to your settings file.
+
+.. code:: python
+
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+
+If your Active Directory server requires a domain to be supplied with the username,
+then also specify:
+
+.. code:: python
+
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
+
+
+Custom user filters
+-------------------
+
+By default, any users within ``LDAP_AUTH_SEARCH_BASE`` and of the correct ``LDAP_AUTH_OBJECT_CLASS``
+will be considered a valid user. You can apply further filtering by setting a custom ``LDAP_AUTH_FORMAT_SEARCH_FILTERS``
+callable.
+
+.. code:: python
+
+    # settings.py
+    LDAP_AUTH_FORMAT_SEARCH_FILTERS = "path.to.your.custom_format_search_filters"
+
+    # pay/to/your.py
+    from django_python3_ldap.utils import format_search_filters
+
+    def custom_format_search_filters(ldap_fields):
+        # Add in simple filters.
+        ldap_fields["memberOf"] = "foo"
+        # Call the base format callable.
+        search_filters = format_search_filters(ldap_fields)
+        # Advanced: apply custom LDAP filter logic.
+        search_filters.append("(|(memberOf=groupA)(memberOf=GroupB))")
+        # All done!
+        return search_filters
+
+The returned list of search filters will be AND'd together to make the final search filter.
 
 
 How it works

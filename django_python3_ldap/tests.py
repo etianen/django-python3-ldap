@@ -43,29 +43,6 @@ class TestLdap(TestCase):
 
     # LDAP tests.
 
-    def testGetUserArgsSuccess(self):
-        with connection() as c:
-            user = c.get_user(
-                settings.LDAP_AUTH_TEST_USER_USERNAME,
-            )
-            self.assertIsInstance(user, User)
-            self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
-
-    def testGetUserArgsIncorrectUsername(self):
-        with connection() as c:
-            user = c.get_user(
-                "bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
-            )
-            self.assertEqual(user, None)
-
-    def testGetUserArgsExtraField(self):
-        with self.assertRaises(TypeError, msg="Expected arguments: username"):
-            with connection() as c:
-                c.get_user(
-                    settings.LDAP_AUTH_TEST_USER_USERNAME,
-                    "foo",
-                )
-
     def testGetUserKwargsSuccess(self):
         with connection() as c:
             user = c.get_user(
@@ -80,27 +57,6 @@ class TestLdap(TestCase):
                 username = "bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
             )
             self.assertEqual(user, None)
-
-    def testGetUserKwrgsExtraField(self):
-        with self.assertRaises(TypeError, msg="Expected arguments: username"):
-            with connection() as c:
-                c.get_user(
-                    username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-                    foo = "foo",
-                )
-
-    def testGetUserBothArgsAndKwargs(self):
-        with self.assertRaises(TypeError, msg="Cannot use both args and kwargs to identify a user"):
-            with connection() as c:
-                c.get_user(
-                    settings.LDAP_AUTH_TEST_USER_USERNAME,
-                    username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-                )
-
-    def testGetUserMissingArgsAndKwargs(self):
-        with self.assertRaises(TypeError, msg="Expected arguments: username"):
-            with connection() as c:
-                c.get_user()
 
     # Authentication tests.
 
