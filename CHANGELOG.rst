@@ -1,6 +1,16 @@
 django-python3-ldap changelog
 =============================
 
+0.9.7
+-----
+
+- Ability to configure extra filters for user lookup using LDAP_AUTH_SEARCH_FILTERS (@etianen, @Ernest0x).
+- Support for Active Directory LDAP servers (@etianen, @brandonusher).
+- Python 2.7 compatibility (@NotSqrt).
+- Ability to configure relations on loaded user models using LDAP_AUTH_SYNC_USER_RELATIONS (@mnach).
+- Switched to specifying paths to functions using dotted string paths in settings (@mnach).
+
+
 0.9.6
 -----
 
