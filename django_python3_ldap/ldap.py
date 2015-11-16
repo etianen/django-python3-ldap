@@ -89,6 +89,7 @@ class Connection(object):
             search_filter = format_search_filter(kwargs),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
             attributes = ldap3.ALL_ATTRIBUTES,
+            get_operational_attributes = True,
             size_limit = 1,
         ):
             return self._get_or_create_user(self._connection.response[0])
