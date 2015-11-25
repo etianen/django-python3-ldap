@@ -67,7 +67,7 @@ class Connection(object):
             search_base = settings.LDAP_AUTH_SEARCH_BASE,
             search_filter = format_search_filter({}),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = list(settings.LDAP_AUTH_USER_FIELDS.values()),
+            attributes = ldap3.ALL_ATTRIBUTES,
             paged_size = 30,
         )
         return (
