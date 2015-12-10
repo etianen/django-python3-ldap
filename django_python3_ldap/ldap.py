@@ -74,6 +74,7 @@ class Connection(object):
             self._get_or_create_user(entry)
             for entry
             in paged_entries
+            if entry["type"] == "searchResEntry"
         )
 
     def get_user(self, **kwargs):
