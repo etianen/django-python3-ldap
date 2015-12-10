@@ -5,6 +5,7 @@ python:
   - 3.2
   - 3.3
   - 3.4
+  - 3.5
 env:
   matrix:
     - DJANGO=django==1.7.11
