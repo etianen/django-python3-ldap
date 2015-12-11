@@ -4,8 +4,8 @@ django-python3-ldap changelog
 0.9.8
 -----
 
-- Fixing security vulnerability allowing users to authenticate with a valid username but with an empty password if anonymous authentication is allowed on the LDAP server (@jjagielka).
-- Fixing sync_users command for Microsoft Active Directory (Petros Moisiadis).
+- Fixing security vulnerability allowing users to authenticate with a valid username but with an empty password if anonymous authentication is allowed on the LDAP server (Petros Moisiadis).
+- Fixing sync_users command for Microsoft Active Directory (@jjagielka).
 
 
 0.9.7
