@@ -106,6 +106,12 @@ def connection(**kwargs):
     in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
     # Format the DN for the username.
+    kwargs = {
+        key: value
+        for key, value
+        in kwargs.items()
+        if value
+    }
     username = None
     password = None
     if kwargs:
