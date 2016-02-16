@@ -146,6 +146,53 @@ admin interface.
 Running ``ldap_sync_users`` as a background cron task is another optional way to
 keep all users in sync on a regular basis.
 
+Simple Authentication Example
+-----------------------------
+
+This example assumes your LDAP server accepts anonymous binding. You will need to change the values of ``LDAP_AUTH_URL`` and ``LDAP_AUTH_SEARCH_BASE`` to match your server setup.
+
+If you need a test server, `freeIPA.org <https://www.freeipa.org/page/Demo>`_ has good options.  The example here will use their demo server.  Though you can install a local server, or use an existing one if you can find the settings for it. 
+
+1. Install **django** and **django-python3-ldap** as instructed above
+2. Edit ``settings.py`` to include the following (Adjusting to your LDAP settings):
+
+.. code:: python
+
+    # settings.py
+    INSTALLED_APPS = [
+        ... # Your existing installed apps
+        'django_python3_ldap',
+    ]
+
+    AUTHENTICATION_BACKENDS = [
+        'django.contrib.auth.backends.ModelBackend',
+        'django_python3_ldap.auth.LDAPBackend',
+    ]
+
+    LDAP_AUTH_URL = 'ldap://ipa.demo1.freeipa.org:389'
+    LDAP_AUTH_SEARCH_BASE = 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org'
+
+3. Sync the LDAP users to the local user model ``./manage.py ldap_sync_users`` *(You should see a list of 3 users show as synced)*
+4. Create a local superuser ``python manage.py createsuperuser`` following the prompts
+5. Login as that user `example.com/admin <http://example.com/admin>`_
+6. Open `example.com/admin/user <http://example.com/admin/user>`_ to view list of synced accounts
+7. Open detail for a user you know the LDAP credentials of and set Staff status and/or Superuser status for that user.
+8. Logout
+9. Login as the LDAP user you just gave permissions to, using the LDAP credentials
+10. If you gave superuser permission, you should be able to see the list of users `example.com/admin/user <http://example.com/admin/user>`_
+
+``'django_python3_ldap.auth.LDAPBackend'`` creates a connection to the LDAP database and can authenticate against it. But all of them are set with no permissions initially. So while you can use them with custom models, it's necessary to add ``'django.contrib.auth.backends.ModelBackend'`` to make those users accessible from django backend admin so you can easily manage permissions.
+
+Having more than one ``AUTHENTICATION_BACKENDS`` causes django to attempt authentication against them in order listed so that if the ``ModelBackend`` auth fails, as any user not created in the app locally would, it will fall through to attempt against LDAP.
+
+**Note:** Any time a user is successfully authenticated through the LDAP backend when there wasn't already a user record in the user model, the user will be created in the user model, but will not have any permissions. So if there is an attempt for a user to login through the Admin interface before that user has a record, a record will be created, but to the user it will appear to be a failed login with the message "Please enter the correct username and password for a staff account." . A superuser will have to give the user at least Staff permission for the user to successfully login to the Admin interface.
+
+Tips
+----
+
+- If a user last authenticated against LDAP, the local password in the admin will show "No password set".  If a user with admin rights through ModelBackend sets a password for a user that was previously authenticating against LDAP, that new password will work for the user. But if the user successfully authenticates against the LDAP server (assuming the password is not the same as the local one, causing it to succeed locally), the local one will be removed and the user record will once again show "No password set".
+
+- The ``ModelBackend`` is not required for **django-python3-ldap** to be used. Users will still sync to the user module in django. But the admin interface will not be available to manage users and there will need to be another mechanism provided.
 
 Support and announcements
 -------------------------
