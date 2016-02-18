@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.9.9
+-----
+
+- Fixing anonymous bind in some LDAP servers (@etianen).
+
+
 0.9.8
 -----
 
