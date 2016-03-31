@@ -68,6 +68,7 @@ class Connection(object):
             search_filter = format_search_filter({}),
             search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
             attributes = ldap3.ALL_ATTRIBUTES,
+            get_operational_attributes = True,
             paged_size = 30,
         )
         return (
