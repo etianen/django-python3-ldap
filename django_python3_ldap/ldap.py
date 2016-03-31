@@ -118,13 +118,10 @@ def connection(**kwargs):
         password = kwargs.pop("password")
         username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)(kwargs)
     # Make the connection.
-    if username or password:
-        if settings.LDAP_AUTH_USE_TLS:
-            auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
-        else:
-            auto_bind = ldap3.AUTO_BIND_NO_TLS
+    if settings.LDAP_AUTH_USE_TLS:
+        auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
     else:
-        auto_bind = ldap3.AUTO_BIND_NONE
+        auto_bind = ldap3.AUTO_BIND_NO_TLS
     try:
         with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username, password=password, auto_bind=auto_bind) as c:
             yield Connection(c)
