@@ -113,7 +113,7 @@ LDAP is a very complicated protocol. Enable logging (see below), and see what er
 Logging
 -------
 
-Print information about failed logins to your console by adding the following to your `settings.py` file.
+Print information about failed logins to your console by adding the following to your ``settings.py`` file.
 
 .. code:: python
 
