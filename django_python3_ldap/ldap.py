@@ -3,6 +3,7 @@ Low-level LDAP hooks.
 """
 
 import ldap3
+import logging
 
 from contextlib import contextmanager
 
@@ -10,6 +11,9 @@ from django.contrib.auth import get_user_model
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
+
+
+logger = logging.getLogger(__name__)
 
 
 class Connection(object):
@@ -126,7 +130,11 @@ def connection(**kwargs):
     try:
         with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username, password=password, auto_bind=auto_bind) as c:
             yield Connection(c)
-    except (ldap3.LDAPBindError, ldap3.LDAPSASLPrepError):
+    except ldap3.LDAPBindError as ex:
+        logger.info("LDAP login failed: {ex}".format(ex=ex))
+        yield None
+    except ldap3.LDAPException as ex:
+        logger.warn("LDAP connect failed: {ex}".format(ex=ex))
         yield None
 
 

@@ -1,7 +1,7 @@
 django-python3-ldap
 ===================
 
-**django-python3-ldap** provides a Django LDAP user authentication backend for Python 3.
+**django-python3-ldap** provides a Django LDAP user authentication backend for Python 2 and 3.
 
 
 Features
@@ -10,7 +10,7 @@ Features
 - Authenticate users with an LDAP server.
 - Sync LDAP users with a local Django database.
 - Supports custom Django user models.
-- Works in Python 3!
+- Works in Python 2 and 3!
 
 
 Installation
@@ -26,6 +26,9 @@ Installation
 
 Available settings
 ------------------
+
+**Note**: The settings below show their default values. You only need to add settings to your ``settings.py`` file that you intend to override.
+
 
 .. code:: python
 
@@ -99,6 +102,36 @@ then also specify:
 .. code:: python
 
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
+
+
+Can't get authentication to work?
+---------------------------------
+
+LDAP is a very complicated protocol. Enable logging (see below), and see what error messages the LDAP connection is throwing.
+
+
+Logging
+-------
+
+Print information about failed logins to your console by adding the following to your `settings.py` file.
+
+.. code:: python
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "loggers": {
+            "django_python3_ldap": {
+                "handlers": ["console"],
+                "level": "INFO",
+            },
+        },
+    }
 
 
 Custom user filters
