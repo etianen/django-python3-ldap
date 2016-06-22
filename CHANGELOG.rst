@@ -1,6 +1,16 @@
 django-python3-ldap changelog
 =============================
 
+
+0.9.10
+------
+
+- Django 1.10 compatibility (@etianen, @frennkie).
+- Added operational LDAP attributes to ``iter_users`` (@frennkie).
+- Dropped Django 1.7 compatibility (@etianen).
+- Dropped Python 3.2 and 3.3 compatibility (@etianen).
+
+
 0.9.9
 -----
 
