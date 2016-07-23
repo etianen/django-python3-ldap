@@ -2,6 +2,13 @@ django-python3-ldap changelog
 =============================
 
 
+0.9.11
+------
+
+- LDAP_AUTH_CONNECTION_USERNAME and LDAP_AUTH_CONNECTION_PASSWORD settings have been replaced by a dictionary LDAP_AUTH_CONNECTION_KWARGS to allow ``ldap_sync_user`` command to work with ``User`` models that have their ``username`` or ``password`` field labeled differently e.g. ``email`` and ``pass`` (@audiolion)
+- tox.ini updated to test against Django 1.9 and 1.10 explicitly, added python35 tests to django >=1.8 supporting 3.5 (@audiolion)
+
+
 0.9.10
 ------
 
