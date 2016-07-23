@@ -81,9 +81,13 @@ Available settings
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 
     # The LDAP username and password of a user for authenticating the `ldap_sync_users`
-    # management command. Set to None if you allow anonymous queries.
-    LDAP_AUTH_CONNECTION_USERNAME = None
-    LDAP_AUTH_CONNECTION_PASSWORD = None
+    # management command. If the User model has a different label for `username` or
+    # `password`, modify the keys to the appropriate labels. Values can be set to None
+    # if you allow anonymous queries.
+    LDAP_AUTH_CONNECTION_KWARGS = {
+    	"username": None
+    	"password": None
+    }
 
 
 Microsoft Active Directory support
