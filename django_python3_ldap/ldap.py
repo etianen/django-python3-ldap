@@ -128,7 +128,7 @@ def connection(**kwargs):
     else:
         auto_bind = ldap3.AUTO_BIND_NO_TLS
     try:
-        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL), user=username, password=password, auto_bind=auto_bind) as c:
+        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL, allowed_referral_hosts=[("*", True)]), user=username, password=password, auto_bind=auto_bind) as c:
             yield Connection(c)
     except ldap3.LDAPBindError as ex:
         logger.info("LDAP login failed: {ex}".format(ex=ex))
