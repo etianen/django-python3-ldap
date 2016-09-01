@@ -105,14 +105,12 @@ class LazySettings(object):
         default = "",
     )
 
-    LDAP_AUTH_CONNECTION_USERNAME = LazySetting(
-        name = "LDAP_AUTH_CONNECTION_USERNAME",
-        default = None,
-    )
-
-    LDAP_AUTH_CONNECTION_PASSWORD = LazySetting(
-        name = "LDAP_AUTH_CONNECTION_PASSWORD",
-        default = None,
+    LDAP_AUTH_CONNECTION_KWARGS = LazySetting(
+        name = "LDAP_AUTH_CONNECT_KWARGS",
+        default = {
+            "username": None,
+            "password": None,
+        },
     )
 
 
