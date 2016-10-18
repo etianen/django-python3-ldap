@@ -103,7 +103,7 @@ class TestLdap(TestCase):
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
 
-    # User syncronisation.
+    # User synchronisation.
 
     def testSyncUsersCreatesUsers(self):
         call_command("ldap_sync_users", verbosity=0)

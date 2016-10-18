@@ -38,7 +38,11 @@ class Connection(object):
         If the user does not exist, then it will be created.
         """
         User = get_user_model()
-        attributes = user_data["attributes"]
+
+        attributes = user_data.get("attributes")
+        if attributes is None:
+            return None
+
         # Create the user data.
         user_fields = {
             field_name: attributes.get(attribute_name, ("",))[0]
