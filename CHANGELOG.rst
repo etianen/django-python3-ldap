@@ -1,6 +1,13 @@
 django-python3-ldap changelog
 =============================
 
+0.9.11
+------
+
+- Added support for LDAP referrals (@etianen).
+- Fixed issue with missing LDAP attributes (@smills2929).
+- Tweaks and bugfixes (@smills2929).
+
 
 0.9.10
 ------
