@@ -37,8 +37,13 @@ class Connection(object):
 
         If the user does not exist, then it will be created.
         """
+
+        attributes = user_data.get("attributes")
+        if attributes is None:
+            return None
+
         User = get_user_model()
-        attributes = user_data["attributes"]
+
         # Create the user data.
         user_fields = {
             field_name: attributes.get(attribute_name, ("",))[0]
@@ -75,12 +80,12 @@ class Connection(object):
             get_operational_attributes = True,
             paged_size = 30,
         )
-        return (
+        return filter(None, (
             self._get_or_create_user(entry)
             for entry
             in paged_entries
             if entry["type"] == "searchResEntry"
-        )
+        ))
 
     def get_user(self, **kwargs):
         """
