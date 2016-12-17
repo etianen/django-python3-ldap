@@ -25,7 +25,7 @@ def clean_ldap_name(name):
     Transforms the given name into a form that
     won't interfere with LDAP queries.
     """
-    return re.sub(r'[^a-zA-Z0-9 _\-.@]', lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(), force_text(name))
+    return re.sub(r'[^a-zA-Z0-9 _\-.@:*]', lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(), force_text(name))
 
 
 def convert_model_fields_to_ldap_fields(model_fields):
