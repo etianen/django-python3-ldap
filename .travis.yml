@@ -17,9 +17,14 @@ matrix:
 cache:
   directories:
     - $HOME/.cache/pip
+before_install:
+  # Install the latest version of pyenv.
+  - rm -rf ~/.pyenv
+  - curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+  # Install python.
+  - pyenv install
+  - python --version
 install:
   - travis_retry pip install tox
-script:
-  - tox
 notifications:
   email: false
