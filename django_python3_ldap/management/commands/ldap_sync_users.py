@@ -12,9 +12,12 @@ class Command(BaseCommand):
     @transaction.atomic()
     def handle(self, *args, **kwargs):
         verbosity = int(kwargs.get("verbosity", 1))
-        with ldap.connection(username=settings.LDAP_AUTH_CONNECTION_USERNAME, password=settings.LDAP_AUTH_CONNECTION_PASSWORD) as connection:
+        with ldap.connection(
+            username=settings.LDAP_AUTH_CONNECTION_USERNAME,
+            password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
+        ) as connection:
             for user in connection.iter_users():
                 if verbosity >= 1:
                     self.stdout.write("Synced {user}".format(
-                        user = user,
+                        user=user,
                     ))

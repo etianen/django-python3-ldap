@@ -2,8 +2,8 @@
 Some useful LDAP utilities.
 """
 
-import re, binascii
-
+import re
+import binascii
 from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
@@ -25,7 +25,11 @@ def clean_ldap_name(name):
     Transforms the given name into a form that
     won't interfere with LDAP queries.
     """
-    return re.sub(r'[^a-zA-Z0-9 _\-.@]', lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(), force_text(name))
+    return re.sub(
+        r'[^a-zA-Z0-9 _\-.@]',
+        lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(),
+        force_text(name),
+    )
 
 
 def convert_model_fields_to_ldap_fields(model_fields):
@@ -45,10 +49,10 @@ def format_search_filter(model_fields):
     Creates an LDAP search filter for the given set of model
     fields.
     """
-    ldap_fields = convert_model_fields_to_ldap_fields(model_fields);
+    ldap_fields = convert_model_fields_to_ldap_fields(model_fields)
     ldap_fields["objectClass"] = settings.LDAP_AUTH_OBJECT_CLASS
     search_filters = import_func(settings.LDAP_AUTH_FORMAT_SEARCH_FILTERS)(ldap_fields)
-    return "(&{})".format("".join(search_filters));
+    return "(&{})".format("".join(search_filters))
 
 
 def clean_user_data(model_fields):
@@ -67,15 +71,15 @@ def format_username_openldap(model_fields):
     binding to an OpenLDAP server.
     """
     return "{user_identifier},{search_base}".format(
-        user_identifier = ",".join(
+        user_identifier=",".join(
             "{attribute_name}={field_value}".format(
-                attribute_name = clean_ldap_name(field_name),
-                field_value = clean_ldap_name(field_value),
+                attribute_name=clean_ldap_name(field_name),
+                field_value=clean_ldap_name(field_value),
             )
             for field_name, field_value
             in convert_model_fields_to_ldap_fields(model_fields).items()
         ),
-        search_base = settings.LDAP_AUTH_SEARCH_BASE,
+        search_base=settings.LDAP_AUTH_SEARCH_BASE,
     )
 
 
@@ -87,8 +91,8 @@ def format_username_active_directory(model_fields):
     username = model_fields["username"]
     if settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN:
         username = "{domain}\\{username}".format(
-            domain = settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
-            username = username,
+            domain=settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
+            username=username,
         )
     return username
 
@@ -101,8 +105,8 @@ def sync_user_relations(user, ldap_attributes):
 def format_search_filters(ldap_fields):
     return [
         "({attribute_name}={field_value})".format(
-            attribute_name = clean_ldap_name(field_name),
-            field_value = clean_ldap_name(field_value),
+            attribute_name=clean_ldap_name(field_name),
+            field_value=clean_ldap_name(field_value),
         )
         for field_name, field_value
         in ldap_fields.items()

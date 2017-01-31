@@ -46,7 +46,7 @@ class TestLdap(TestCase):
     def testGetUserKwargsSuccess(self):
         with connection() as c:
             user = c.get_user(
-                username = settings.LDAP_AUTH_TEST_USER_USERNAME,
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
             )
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
@@ -54,7 +54,7 @@ class TestLdap(TestCase):
     def testGetUserKwargsIncorrectUsername(self):
         with connection() as c:
             user = c.get_user(
-                username = "bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
+                username="bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
             )
             self.assertEqual(user, None)
 
@@ -62,34 +62,34 @@ class TestLdap(TestCase):
 
     def testAuthenticateUserSuccess(self):
         user = authenticate(
-            username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-            password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
         )
         self.assertIsInstance(user, User)
         self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
 
     def testAuthenticateUserBadUsername(self):
         user = authenticate(
-            username = "bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
-            password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            username="bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
         )
         self.assertEqual(user, None)
 
     def testAuthenticateUserBadPassword(self):
         user = authenticate(
-            username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-            password = "bad" + settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password="bad" + settings.LDAP_AUTH_TEST_USER_PASSWORD,
         )
         self.assertEqual(user, None)
 
     def testRepeatedUserAuthenticationDoestRecreateUsers(self):
         user_1 = authenticate(
-            username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-            password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
         )
         user_2 = authenticate(
-            username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-            password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
         )
         # Ensure that the user isn't recreated on second access.
         self.assertEqual(user_1.pk, user_2.pk)
@@ -97,8 +97,8 @@ class TestLdap(TestCase):
     def testAuthenticateWithTLS(self):
         with self.settings(LDAP_AUTH_USE_TLS=True):
             user = authenticate(
-                username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-                password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
             )
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
@@ -128,7 +128,7 @@ class TestLdap(TestCase):
 
     def testPromoteUser(self):
         user = User.objects.create(
-            username = "test",
+            username="test",
         )
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
@@ -139,7 +139,7 @@ class TestLdap(TestCase):
         self.assertTrue(user.is_superuser)
 
     def testPromoteMissingUser(self):
-        with self.assertRaises(CommandError, msg="User with username missing_user does not exist") as cm:
+        with self.assertRaises(CommandError, msg="User with username missing_user does not exist"):
             call_command("ldap_promote", "missing_user", verbosity=0)
 
     def testSyncUserRelations(self):
@@ -150,7 +150,6 @@ class TestLdap(TestCase):
             self.assertEqual(user.username, User.objects.get(pk=user.id).username)
             # save all groups
             self.assertIn('cn', data)
-            groups = list()
             ldap_groups = list(data.get('memberOf', ()))
             ldap_groups.append('default_group')
             for group in ldap_groups:
@@ -158,8 +157,8 @@ class TestLdap(TestCase):
 
         with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS=check_sync_user_relation):
             user = authenticate(
-                username = settings.LDAP_AUTH_TEST_USER_USERNAME,
-                password = settings.LDAP_AUTH_TEST_USER_PASSWORD,
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
             )
             self.assertIsInstance(user, User)
             self.assertGreaterEqual(user.groups.count(), 1)

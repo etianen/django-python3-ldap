@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 raise CommandError("User with username {username} does not exist".format(
-                    username = username,
+                    username=username,
                 ))
             else:
                 user.is_staff = True
@@ -33,5 +33,5 @@ class Command(BaseCommand):
                 user.save()
                 if verbosity >= 1:
                     self.stdout.write("Promoted {user} to admin superuser".format(
-                        user = user,
+                        user=user,
                     ))

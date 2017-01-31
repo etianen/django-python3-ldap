@@ -7,19 +7,19 @@ version_str = ".".join(str(n) for n in __version__)
 
 
 setup(
-    name = "django-python3-ldap",
-    version = version_str,
-    license = "BSD",
-    description = "Django LDAP user authentication backend for Python 3.",
-    author = "Dave Hall",
-    author_email = "dave@etianen.com",
-    url = "https://github.com/etianen/django-python3-ldap",
-    packages = find_packages(),
-    install_requires = [
-        "django>=1.7",
-        "ldap3>=0.9.8.4,<=1.4.0,!=0.9.9.2",
+    name="django-python3-ldap",
+    version=version_str,
+    license="BSD",
+    description="Django LDAP user authentication backend for Python 3.",
+    author="Dave Hall",
+    author_email="dave@etianen.com",
+    url="https://github.com/etianen/django-python3-ldap",
+    packages=find_packages(),
+    install_requires=[
+        "django>=1.8",
+        "ldap3==2.2.0",
     ],
-    classifiers = [
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",

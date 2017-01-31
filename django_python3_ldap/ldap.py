@@ -3,12 +3,10 @@ Low-level LDAP hooks.
 """
 
 import ldap3
+from ldap3.core.exceptions import LDAPException
 import logging
-
 from contextlib import contextmanager
-
 from django.contrib.auth import get_user_model
-
 from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
 
@@ -59,7 +57,7 @@ class Connection(object):
         }
         # Update or create the user.
         user, created = User.objects.update_or_create(
-            defaults = user_fields,
+            defaults=user_fields,
             **user_lookup
         )
         # Update relations
@@ -73,12 +71,12 @@ class Connection(object):
         users in the LDAP database.
         """
         paged_entries = self._connection.extend.standard.paged_search(
-            search_base = settings.LDAP_AUTH_SEARCH_BASE,
-            search_filter = format_search_filter({}),
-            search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = ldap3.ALL_ATTRIBUTES,
-            get_operational_attributes = True,
-            paged_size = 30,
+            search_base=settings.LDAP_AUTH_SEARCH_BASE,
+            search_filter=format_search_filter({}),
+            search_scope=ldap3.SUBTREE,
+            attributes=ldap3.ALL_ATTRIBUTES,
+            get_operational_attributes=True,
+            paged_size=30,
         )
         return filter(None, (
             self._get_or_create_user(entry)
@@ -96,12 +94,12 @@ class Connection(object):
         """
         # Search the LDAP database.
         if self._connection.search(
-            search_base = settings.LDAP_AUTH_SEARCH_BASE,
-            search_filter = format_search_filter(kwargs),
-            search_scope = ldap3.SEARCH_SCOPE_WHOLE_SUBTREE,
-            attributes = ldap3.ALL_ATTRIBUTES,
-            get_operational_attributes = True,
-            size_limit = 1,
+            search_base=settings.LDAP_AUTH_SEARCH_BASE,
+            search_filter=format_search_filter(kwargs),
+            search_scope=ldap3.SUBTREE,
+            attributes=ldap3.ALL_ATTRIBUTES,
+            get_operational_attributes=True,
+            size_limit=1,
         ):
             return self._get_or_create_user(self._connection.response[0])
         return None
@@ -133,13 +131,17 @@ def connection(**kwargs):
     else:
         auto_bind = ldap3.AUTO_BIND_NO_TLS
     try:
-        with ldap3.Connection(ldap3.Server(settings.LDAP_AUTH_URL, allowed_referral_hosts=[("*", True)]), user=username, password=password, auto_bind=auto_bind) as c:
+        with ldap3.Connection(ldap3.Server(
+            settings.LDAP_AUTH_URL,
+            allowed_referral_hosts=[("*", True)]),
+            user=username,
+            password=password,
+            auto_bind=auto_bind,
+            raise_exceptions=True,
+        ) as c:
             yield Connection(c)
-    except ldap3.LDAPBindError as ex:
-        logger.info("LDAP login failed: {ex}".format(ex=ex))
-        yield None
-    except ldap3.LDAPException as ex:
-        logger.warn("LDAP connect failed: {ex}".format(ex=ex))
+    except LDAPException as ex:
+        logger.info("LDAP connect failed: {ex}".format(ex=ex))
         yield None
 
 
