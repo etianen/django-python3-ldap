@@ -1,14 +1,8 @@
 language: python
 sudo: false
 python:
-  - 2.7
-  - 3.4
   - 3.5
 env:
-  matrix:
-    - DJANGO=django==1.8.14
-    - DJANGO=django==1.9.9
-    - DJANGO=django==1.10
   global:
     # LDAP_AUTH_URL
     - secure: "SQCh4GVbzQl8f5Fr8gbmHWfeVbVrbU+KuBPh3j72D6jjzRCLXEW6/tI7ttqE/HciR1e9u3AG7nO51W7IGitW26+SnOcrDnPDSqJ+6V4jzttlOAgNMN15G6yRQ7IRuA3p1og4IikYVlyO10buR4jCqPXZDqf9YxRRVn17b/1TNVs="
@@ -24,11 +18,8 @@ cache:
   directories:
     - $HOME/.cache/pip
 install:
-  - travis_retry pip install $DJANGO "coverage<4.0"
-  - pip install -e .
+  - travis_retry pip install tox
 script:
-  - coverage run tests/manage.py test django_python3_ldap
-after_script:
-  - coverage report
+  - tox
 notifications:
   email: false
