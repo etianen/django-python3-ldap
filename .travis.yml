@@ -23,8 +23,9 @@ before_install:
   - rm -rf ~/.pyenv
   - curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
   # Install python.
-  - pyenv install
-  - python --version
+  - pyenv install 2.7.13
+  - pyenv install 3.5.2
+  - pyenv install 3.6.0
 install:
   - travis_retry pip install tox
 notifications:
