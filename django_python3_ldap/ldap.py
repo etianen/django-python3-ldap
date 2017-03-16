@@ -44,9 +44,14 @@ class Connection(object):
 
         # Create the user data.
         user_fields = {
-            field_name: attributes.get(attribute_name, ("",))[0]
+            field_name: (
+                attributes[attribute_name][0]
+                if isinstance(attributes[attribute_name], (list, tuple)) else
+                attributes[attribute_name]
+            )
             for field_name, attribute_name
             in settings.LDAP_AUTH_USER_FIELDS.items()
+            if attribute_name in attributes
         }
         user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
         # Create the user lookup.
