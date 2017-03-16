@@ -3,4 +3,4 @@ Django LDAP user authentication backend for Python 3.
 """
 
 
-__version__ = (0, 9, 11)
+__version__ = (0, 9, 12)

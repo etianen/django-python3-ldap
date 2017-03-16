@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.9.12
+------
+
+- Update for compatibility with ldap3 2.x release (@etianen).
+
+
 0.9.11
 ------
 
