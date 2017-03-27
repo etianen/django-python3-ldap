@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.9.13
+------
+
+- Fixed issue with LDAP servers returning attributes that are not a list (@etianen).
+
+
 0.9.12
 ------
 
