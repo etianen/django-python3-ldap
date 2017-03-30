@@ -150,7 +150,7 @@ def connection(**kwargs):
         yield None
 
 
-def authenticate(**kwargs):
+def authenticate(*args, **kwargs):
     """
     Authenticates with the LDAP server, and returns
     the corresponding Django user instance.
