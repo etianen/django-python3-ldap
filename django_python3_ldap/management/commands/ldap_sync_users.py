@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from django_python3_ldap import ldap
@@ -16,6 +16,8 @@ class Command(BaseCommand):
             username=settings.LDAP_AUTH_CONNECTION_USERNAME,
             password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
         ) as connection:
+            if connection is None:
+                raise CommandError("Could not connect to LDAP server")
             for user in connection.iter_users():
                 if verbosity >= 1:
                     self.stdout.write("Synced {user}".format(
