@@ -98,7 +98,7 @@ For simple usernames (e.g. "username"), use:
 
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
 
-For down-level login name formats (e.g. "DOMAIN\username"), use:
+For down-level login name formats (e.g. "DOMAIN\\username"), use:
 
 .. code:: python
 
