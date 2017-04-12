@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.9.14
+------
+
+- Django 1.11 compatibility (@aritas1).
+
+
 0.9.13
 ------
 
