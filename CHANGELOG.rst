@@ -1,9 +1,10 @@
 django-python3-ldap changelog
 =============================
 
-Development
------------
+0.10.0 - Development
+--------------------
 
+- If `settings.LDAP_AUTH_CONNECTION_USERNAME` or `settings.LDAP_AUTH_CONNECTION_PASSWORD` is set, then it will be used to query the LDAP database for user details during authentication.
 - Added `django_python3_ldap.utils.format_username_active_directory_principal` option for formatting user-principal-name (e.g. "user@domain.com") Active Directory usernames.
 
 

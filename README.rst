@@ -80,8 +80,9 @@ Available settings
     # Sets the login domain for Active Directory users.
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 
-    # The LDAP username and password of a user for authenticating the `ldap_sync_users`
-    # management command. Set to None if you allow anonymous queries.
+    # The LDAP username and password of a user for querying the LDAP database for user
+    # details. If None, then the authenticated user will be used for querying, and
+    # the `ldap_sync_users` command will perform an anonymous query.
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
