@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+Development
+-----------
+
+- Added `django_python3_ldap.utils.format_username_active_directory_principal` option for formatting user-principal-name (e.g. "user@domain.com") Active Directory usernames.
+
+
 0.9.14
 ------
 

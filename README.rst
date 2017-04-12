@@ -90,18 +90,27 @@ Microsoft Active Directory support
 ----------------------------------
 
 django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
-a Microsoft Active Directory, add the following line to your settings file.
+a Microsoft Active Directory, you need to modify your settings file.
 
-.. code:: python
+*   For simple usernames (e.g. "username"), use:
 
+    ``` py
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+    ```
 
-If your Active Directory server requires a domain to be supplied with the username,
-then also specify:
+*   For down-level login name formats (e.g. "DOMAIN\username"), use:
 
-.. code:: python
+    ``` py
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "DOMAIN"
+    ```
 
-    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
+*   For user-principal-name formats (e.g. "user@domain.com"), use:
+
+    ```
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory_principal"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "domain.com"
+    ```
 
 
 Can't get authentication to work?
