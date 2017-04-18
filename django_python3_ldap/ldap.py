@@ -85,6 +85,7 @@ class Connection(object):
             return None
 
         from django.apps import apps as django_apps
+
         CustomModel = django_apps.get_model(settings.LDAP_USER_PROFILE_MODEL)
 
         # Create the user data.
@@ -100,8 +101,10 @@ class Connection(object):
         }
 
         # Update or create the profile instance.
-        profile, created = CustomModel.objects.update_or_create(user_fields,
-            **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance})
+        profile, created = CustomModel.objects.update_or_create(
+            user_fields,
+            **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance}
+            )
 
         return profile
 
