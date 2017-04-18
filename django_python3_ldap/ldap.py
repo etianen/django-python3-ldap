@@ -67,8 +67,44 @@ class Connection(object):
         )
         # Update relations
         import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
+
         # All done!
+        if settings.LDAP_USER_PROFILE_MODEL is not None and settings.LDAP_USER_PROFILE_FIELDS is not None:
+            self._get_or_create_user_profile(user, user_data)
+
         return user
+
+
+    def _get_or_create_user_profile(self, user_instance, ldap_user_data):
+        """
+        Returns a User Profile Model instance for the given user_instance and LDAP user data.
+        If the profile does not exist, then it will be created.
+        """
+
+        attributes = ldap_user_data.get("attributes")
+        if attributes is None:
+            return None
+
+        from django.apps import apps as django_apps
+        CustomModel = django_apps.get_model(settings.LDAP_USER_PROFILE_MODEL)
+
+        # Create the user data.
+        user_fields = {
+            field_name: (
+                attributes[attribute_name][0]
+                if isinstance(attributes[attribute_name], (list, tuple)) else
+                attributes[attribute_name]
+            )
+            for field_name, attribute_name
+            in settings.LDAP_USER_PROFILE_FIELDS.items()
+            if attribute_name in attributes
+        }
+        user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
+
+        # Update or create the profile instance.
+        profile, created = CustomModel.objects.update_or_create(user_fields, **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance})
+
+        return profile
 
     def iter_users(self):
         """
