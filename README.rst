@@ -53,6 +53,15 @@ Available settings
         "email": "mail",
     }
 
+    # Custom User model
+    LDAP_USER_PROFILE_MODEL = 'users.Employee'
+
+    #Attributes mapped
+    LDAP_USER_PROFILE_FIELDS = {
+        "position": "title",
+        "department": "department"
+    }
+
     # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
 

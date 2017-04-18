@@ -99,7 +99,7 @@ class Connection(object):
             in settings.LDAP_USER_PROFILE_FIELDS.items()
             if attribute_name in attributes
         }
-        user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
+        #user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
 
         # Update or create the profile instance.
         profile, created = CustomModel.objects.update_or_create(user_fields, **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance})
