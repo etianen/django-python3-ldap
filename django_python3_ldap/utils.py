@@ -97,6 +97,20 @@ def format_username_active_directory(model_fields):
     return username
 
 
+def format_username_active_directory_principal(model_fields):
+    """
+    Formats a user identifier into a username suitable for
+    binding to an Active Directory server.
+    """
+    username = model_fields["username"]
+    if settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN:
+        username = "{username}@{domain}".format(
+            username=username,
+            domain=settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
+        )
+    return username
+
+
 def sync_user_relations(user, ldap_attributes):
     # do nothing by default
     pass

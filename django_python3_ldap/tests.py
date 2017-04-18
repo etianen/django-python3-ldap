@@ -103,6 +103,31 @@ class TestLdap(TestCase):
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
 
+    def testAuthenticateWithRebind(self):
+        with self.settings(
+            LDAP_AUTH_USE_TLS=True,
+            LDAP_AUTH_CONNECTION_USERNAME=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            LDAP_AUTH_CONNECTION_PASSWORD=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+        ):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
+
+    def testAuthenticateWithFailedRebind(self):
+        with self.settings(
+            LDAP_AUTH_USE_TLS=True,
+            LDAP_AUTH_CONNECTION_USERNAME="bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
+            LDAP_AUTH_CONNECTION_PASSWORD=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+        ):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIs(user, None)
+
     # User synchronisation.
 
     def testSyncUsersCreatesUsers(self):

@@ -119,6 +119,7 @@ def connection(**kwargs):
     in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
     # Format the DN for the username.
+    format_username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)
     kwargs = {
         key: value
         for key, value
@@ -129,25 +130,50 @@ def connection(**kwargs):
     password = None
     if kwargs:
         password = kwargs.pop("password")
-        username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)(kwargs)
-    # Make the connection.
+        username = format_username(kwargs)
+    # Configure the connection.
     if settings.LDAP_AUTH_USE_TLS:
         auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
     else:
         auto_bind = ldap3.AUTO_BIND_NO_TLS
+    # Connect.
     try:
-        with ldap3.Connection(ldap3.Server(
-            settings.LDAP_AUTH_URL,
-            allowed_referral_hosts=[("*", True)]),
+        c = ldap3.Connection(
+            ldap3.Server(
+                settings.LDAP_AUTH_URL,
+                allowed_referral_hosts=[("*", True)],
+            ),
             user=username,
             password=password,
             auto_bind=auto_bind,
             raise_exceptions=True,
-        ) as c:
-            yield Connection(c)
+        )
     except LDAPException as ex:
         logger.info("LDAP connect failed: {ex}".format(ex=ex))
         yield None
+        return
+    # If the settings specify an alternative username and password for querying, rebind as that.
+    if (
+        (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
+        (
+            settings.LDAP_AUTH_CONNECTION_USERNAME != username or
+            settings.LDAP_AUTH_CONNECTION_PASSWORD != password
+        )
+    ):
+        try:
+            c.rebind(
+                user=format_username({"username": settings.LDAP_AUTH_CONNECTION_USERNAME}),
+                password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
+            )
+        except LDAPException as ex:
+            logger.info("LDAP rebind failed: {ex}".format(ex=ex))
+            yield None
+            return
+    # Return the connection.
+    try:
+        yield Connection(c)
+    finally:
+        c.unbind()
 
 
 def authenticate(*args, **kwargs):

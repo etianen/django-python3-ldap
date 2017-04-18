@@ -80,8 +80,9 @@ Available settings
     # Sets the login domain for Active Directory users.
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 
-    # The LDAP username and password of a user for authenticating the `ldap_sync_users`
-    # management command. Set to None if you allow anonymous queries.
+    # The LDAP username and password of a user for querying the LDAP database for user
+    # details. If None, then the authenticated user will be used for querying, and
+    # the `ldap_sync_users` command will perform an anonymous query.
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
@@ -90,18 +91,27 @@ Microsoft Active Directory support
 ----------------------------------
 
 django-python3-ldap is configured by default to support login via OpenLDAP. To connect to
-a Microsoft Active Directory, add the following line to your settings file.
+a Microsoft Active Directory, you need to modify your settings file.
+
+For simple usernames (e.g. "username"):
 
 .. code:: python
 
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
 
-If your Active Directory server requires a domain to be supplied with the username,
-then also specify:
+For down-level login name formats (e.g. "DOMAIN\\username"):
 
 .. code:: python
 
-    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "your_domain"
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "DOMAIN"
+
+For user-principal-name formats (e.g. "user@domain.com"):
+
+.. code:: python
+
+    LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory_principal"
+    LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "domain.com"
 
 
 Can't get authentication to work?
