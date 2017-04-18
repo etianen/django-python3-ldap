@@ -74,7 +74,6 @@ class Connection(object):
 
         return user
 
-
     def _get_or_create_user_profile(self, user_instance, ldap_user_data):
         """
         Returns a User Profile Model instance for the given user_instance and LDAP user data.
@@ -99,10 +98,10 @@ class Connection(object):
             in settings.LDAP_USER_PROFILE_FIELDS.items()
             if attribute_name in attributes
         }
-        #user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
 
         # Update or create the profile instance.
-        profile, created = CustomModel.objects.update_or_create(user_fields, **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance})
+        profile, created = CustomModel.objects.update_or_create(user_fields,
+            **{settings.LDAP_USER_PROFILE_USER_KEY: user_instance})
 
         return profile
 
