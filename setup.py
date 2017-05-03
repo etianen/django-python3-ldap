@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "django>=1.8",
-        "ldap3==2.2.0",
+        "ldap3==2.2.3",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
