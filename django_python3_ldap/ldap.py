@@ -38,6 +38,7 @@ class Connection(object):
 
         attributes = user_data.get("attributes")
         if attributes is None:
+            logger.warning("LDAP user attributes empty")
             return None
 
         User = get_user_model()
@@ -68,6 +69,7 @@ class Connection(object):
         # Update relations
         import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
         # All done!
+        logger.info("LDAP user lookup succeeded")
         return user
 
     def iter_users(self):
@@ -107,6 +109,7 @@ class Connection(object):
             size_limit=1,
         ):
             return self._get_or_create_user(self._connection.response[0])
+        logger.warning("LDAP user lookup failed")
         return None
 
 
@@ -149,7 +152,7 @@ def connection(**kwargs):
             raise_exceptions=True,
         )
     except LDAPException as ex:
-        logger.info("LDAP connect failed: {ex}".format(ex=ex))
+        logger.warning("LDAP connect failed: {ex}".format(ex=ex))
         yield None
         return
     # If the settings specify an alternative username and password for querying, rebind as that.
@@ -166,10 +169,11 @@ def connection(**kwargs):
                 password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
             )
         except LDAPException as ex:
-            logger.info("LDAP rebind failed: {ex}".format(ex=ex))
+            logger.warning("LDAP rebind failed: {ex}".format(ex=ex))
             yield None
             return
     # Return the connection.
+    logger.info("LDAP connect succeeded")
     try:
         yield Connection(c)
     finally:
