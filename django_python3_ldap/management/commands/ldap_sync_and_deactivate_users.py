@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 
 class Command(BaseCommand):
  
-    help = "Creates local user models for all users found in the remote LDAP \ 
-            authentication server and deactivates users that were not found in LDAP"
+    help = """  Creates local user models for all users found in the remote LDAP
+                authentication server and deactivates users that were not found in LDAP"""
 
     @transaction.atomic()
     def handle(self, *args, **kwargs):
