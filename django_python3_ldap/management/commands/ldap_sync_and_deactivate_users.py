@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 class Command(BaseCommand):
 
-    help = "Creates local user models for all users found in the remote LDAP authentication server."
+    help = "Creates local user models for all users found in the remote LDAP authentication server and deactivates users that were not found in LDAP"
 
     @transaction.atomic()
     def handle(self, *args, **kwargs):
@@ -18,6 +18,7 @@ class Command(BaseCommand):
         ) as connection:
             if connection is None:
                 raise CommandError("Could not connect to LDAP server")
+            
             user_list = []
             
             for user in connection.iter_users():
@@ -28,13 +29,11 @@ class Command(BaseCommand):
                     user_list.append(user)
             
             user_difference = list(set(User.objects.all()) - set(user_list))
-            print(user_difference)
 
             for user in user_difference:
                 user.is_active = False
                 user.save()
                 self.stdout.write("Deactivated {user}".format(
                     user=user,
-                ))                
-            #print(list(connection.user_list()))
+                ))
 
