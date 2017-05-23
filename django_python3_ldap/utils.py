@@ -60,8 +60,6 @@ def clean_user_data(model_fields):
     Transforms the user data loaded from
     LDAP into a form suitable for creating a user.
     """
-    # Create an unusable password for the user.
-    model_fields["password"] = make_password(None)
     return model_fields
 
 
