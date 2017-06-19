@@ -16,7 +16,7 @@ class Command(BaseCommand):
         User = get_user_model()
         auth_kwargs = {
             User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME,
-            password: settings.LDAP_AUTH_CONNECTION_PASSWORD
+            'password': settings.LDAP_AUTH_CONNECTION_PASSWORD
         }
         with ldap.connection(**auth_kwargs) as connection:
             if connection is None:
