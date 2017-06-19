@@ -167,9 +167,10 @@ def connection(**kwargs):
             settings.LDAP_AUTH_CONNECTION_PASSWORD != password
         )
     ):
+        User = get_user_model()
         try:
             c.rebind(
-                user=format_username({"username": settings.LDAP_AUTH_CONNECTION_USERNAME}),
+                user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
                 password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
             )
         except LDAPException as ex:

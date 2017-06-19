@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
@@ -12,10 +13,12 @@ class Command(BaseCommand):
     @transaction.atomic()
     def handle(self, *args, **kwargs):
         verbosity = int(kwargs.get("verbosity", 1))
-        with ldap.connection(
-            username=settings.LDAP_AUTH_CONNECTION_USERNAME,
-            password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
-        ) as connection:
+        User = get_user_model()
+        auth_kwargs = {
+            User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME,
+            password: settings.LDAP_AUTH_CONNECTION_PASSWORD
+        }
+        with ldap.connection(**auth_kwargs) as connection:
             if connection is None:
                 raise CommandError("Could not connect to LDAP server")
             for user in connection.iter_users():
