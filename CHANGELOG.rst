@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.11.0
+------
+
+- Support added for User models with a ``USERNAME_FIELD`` other than ``username`` (@audiolion)
+
+
 0.10.0
 ------
 
