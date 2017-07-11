@@ -149,6 +149,7 @@ def connection(**kwargs):
             ldap3.Server(
                 settings.LDAP_AUTH_URL,
                 allowed_referral_hosts=[("*", True)],
+                get_info=ldap3.NONE,
             ),
             user=username,
             password=password,
