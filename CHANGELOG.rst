@@ -4,7 +4,8 @@ django-python3-ldap changelog
 0.11.0
 ------
 
-- Support added for User models with a ``USERNAME_FIELD`` other than ``username`` (@audiolion)
+- Support added for User models with a ``USERNAME_FIELD`` other than ``username`` (@audiolion).
+- Fixed bug with `pyasn1` version (@etianen).
 
 
 0.10.0
