@@ -156,7 +156,7 @@ callable.
     # settings.py
     LDAP_AUTH_FORMAT_SEARCH_FILTERS = "path.to.your.custom_format_search_filters"
 
-    # pay/to/your.py
+    # path/to/your/module.py
     from django_python3_ldap.utils import format_search_filters
 
     def custom_format_search_filters(ldap_fields):
