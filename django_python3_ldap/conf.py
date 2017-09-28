@@ -115,5 +115,15 @@ class LazySettings(object):
         default=None,
     )
 
+    LDAP_AUTH_CONNECT_TIMEOUT = LazySetting(
+        name="LDAP_AUTH_CONNECT_TIMEOUT",
+        default=None
+    )
+
+    LDAP_AUTH_RECEIVE_TIMEOUT = LazySetting(
+        name="LDAP_AUTH_RECEIVE_TIMEOUT",
+        default=None
+    )
+
 
 settings = LazySettings(settings)

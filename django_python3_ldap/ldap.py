@@ -150,11 +150,13 @@ def connection(**kwargs):
                 settings.LDAP_AUTH_URL,
                 allowed_referral_hosts=[("*", True)],
                 get_info=ldap3.NONE,
+                connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
             ),
             user=username,
             password=password,
             auto_bind=auto_bind,
             raise_exceptions=True,
+            receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
         )
     except LDAPException as ex:
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
