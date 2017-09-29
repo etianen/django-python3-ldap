@@ -7,15 +7,14 @@ from ldap3.core.exceptions import LDAPException
 import logging
 from contextlib import contextmanager
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
-
 
 logger = logging.getLogger(__name__)
 
 
 class Connection(object):
-
     """
     A connection to an LDAP server.
     """
@@ -61,11 +60,21 @@ class Connection(object):
             for field_name
             in settings.LDAP_AUTH_USER_LOOKUP_FIELDS
         }
+        # Added this to handle the fact that groups is a list that actually needs to stay as a list
+        try:
+            groups = attributes.get(settings.LDAP_AUTH_USER_FIELDS.get('groups'))
+            logger.debug('Fetched groups list')
+            user_fields.pop('groups', None)
+        except:
+            groups = None
+            logger.debug('No groups found')
         # Update or create the user.
         user, created = User.objects.update_or_create(
             defaults=user_fields,
             **user_lookup
         )
+        if groups:
+            self._update_or_create_user_groups(user, groups)
         # If the user was created, set them an unusable password.
         if created:
             user.set_unusable_password()
@@ -75,6 +84,34 @@ class Connection(object):
         # All done!
         logger.info("LDAP user lookup succeeded")
         return user
+
+    def _update_or_create_user_groups(self, user_object, groups):
+        logger.info("Handling user groups...")
+        if isinstance(groups, str):
+            logger.error(
+                'Invalid groups input; must be of type list. Failed to assign groups for {}'.format(user_object))
+            return False
+
+        for group in groups:
+            logger.debug("Assigning {} to group {}".format(user_object, group))
+            try:
+                name = str(group).split(',')[0].split('=')[1]  # Splitting ldap group DN to just the CN part.
+                permissions = None
+                django_group, created = Group.objects.update_or_create(
+                    name=name,
+                )
+
+                if created:
+                    logger.debug("Created new group {}".format(name))
+
+                logger.debug("Assigning {} to group {}".format(user_object, name))
+                django_group.user_set.add(user_object)
+                logger.debug("Assignment successful")
+            except:
+                logger.error('Unknown error trying to assign {} to group {}'.format(user_object, group), exc_info=True)
+                continue
+        logger.info('User to group association successful')
+        return True
 
     def iter_users(self):
         """
