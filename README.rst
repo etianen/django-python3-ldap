@@ -86,6 +86,10 @@ Available settings
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
+    # Set connection/receive timeouts (in seconds) on the underlying `ldap3` library.
+    LDAP_AUTH_CONNECT_TIMEOUT = None
+    LDAP_AUTH_RECEIVE_TIMEOUT = None
+
 
 Microsoft Active Directory support
 ----------------------------------
