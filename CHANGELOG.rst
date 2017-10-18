@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.11.1
+------
+
+- Added `LDAP_AUTH_CONNECT_TIMEOUT` and `LDAP_AUTH_RECEIVE_TIMEOUT` settings (@alizain).
+
+
 0.11.0
 ------
 
