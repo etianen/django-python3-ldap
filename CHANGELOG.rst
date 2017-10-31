@@ -1,8 +1,21 @@
 django-python3-ldap changelog
 =============================
 
-0.10.0 - Development
---------------------
+0.11.1
+------
+
+- Added `LDAP_AUTH_CONNECT_TIMEOUT` and `LDAP_AUTH_RECEIVE_TIMEOUT` settings (@alizain).
+
+
+0.11.0
+------
+
+- Support added for User models with a ``USERNAME_FIELD`` other than ``username`` (@audiolion).
+- Fixed bug with `pyasn1` version (@etianen).
+
+
+0.10.0
+------
 
 - If `settings.LDAP_AUTH_CONNECTION_USERNAME` or `settings.LDAP_AUTH_CONNECTION_PASSWORD` is set, then it will be used to query the LDAP database for user details during authentication.
 - Added `django_python3_ldap.utils.format_username_active_directory_principal` option for formatting user-principal-name (e.g. "user@domain.com") Active Directory usernames.

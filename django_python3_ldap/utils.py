@@ -4,7 +4,6 @@ Some useful LDAP utilities.
 
 import re
 import binascii
-from django.contrib.auth.hashers import make_password
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils import six
@@ -60,8 +59,6 @@ def clean_user_data(model_fields):
     Transforms the user data loaded from
     LDAP into a form suitable for creating a user.
     """
-    # Create an unusable password for the user.
-    model_fields["password"] = make_password(None)
     return model_fields
 
 

@@ -87,6 +87,10 @@ Available settings
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
+    # Set connection/receive timeouts (in seconds) on the underlying `ldap3` library.
+    LDAP_AUTH_CONNECT_TIMEOUT = None
+    LDAP_AUTH_RECEIVE_TIMEOUT = None
+
 
 Microsoft Active Directory support
 ----------------------------------
@@ -157,7 +161,7 @@ callable.
     # settings.py
     LDAP_AUTH_FORMAT_SEARCH_FILTERS = "path.to.your.custom_format_search_filters"
 
-    # pay/to/your.py
+    # path/to/your/module.py
     from django_python3_ldap.utils import format_search_filters
 
     def custom_format_search_filters(ldap_fields):

@@ -66,6 +66,10 @@ class Connection(object):
             defaults=user_fields,
             **user_lookup
         )
+        # If the user was created, set them an unusable password.
+        if created:
+            user.set_unusable_password()
+            user.save()
         # Update relations
         import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
         # All done!
@@ -145,11 +149,14 @@ def connection(**kwargs):
             ldap3.Server(
                 settings.LDAP_AUTH_URL,
                 allowed_referral_hosts=[("*", True)],
+                get_info=ldap3.NONE,
+                connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
             ),
             user=username,
             password=password,
             auto_bind=auto_bind,
             raise_exceptions=True,
+            receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
         )
     except LDAPException as ex:
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
@@ -163,9 +170,10 @@ def connection(**kwargs):
             settings.LDAP_AUTH_CONNECTION_PASSWORD != password
         )
     ):
+        User = get_user_model()
         try:
             c.rebind(
-                user=format_username({"username": settings.LDAP_AUTH_CONNECTION_USERNAME}),
+                user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
                 password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
             )
         except LDAPException as ex:
