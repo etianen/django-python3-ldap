@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
- 
+
     help = """  Creates local user models for all users found in the remote LDAP
                 authentication server and deactivates users that were not found in LDAP"""
 
@@ -27,7 +27,7 @@ class Command(BaseCommand):
                         user=user,
                     ))
                     user_list.append(user)
-            
+
             user_difference = list(set(User.objects.all()) - set(user_list))
 
             for user in user_difference:

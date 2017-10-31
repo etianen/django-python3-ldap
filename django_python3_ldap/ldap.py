@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from django.contrib.auth import get_user_model
 from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
-
+from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +70,7 @@ class Connection(object):
         if created:
             user.set_unusable_password()
             user.save()
+
         # Update relations
         import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
         # All done!
