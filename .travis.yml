@@ -40,7 +40,7 @@ deploy:
     secure: e6HaAoVTzvCuBGLk9gkPxMgzYHS/HB7TLxZaqvicVIKRRl9IOGfyNzufU4wa8kUAN0YlDnFk6SYVn2bpsQoctKGWCFdo9BFGOpayGcllrF8ONa+HnB0g9rnu0kRluGeH7SZG7MVJoWYaIKG/MAUUtlxl9uwC2zaO8Cq4zASrJgI=
   on:
     tags: true
-    condition: $DJANGO='>=2.0,<2.1'
+    condition: $DJANGO = '>=2.0,<2.1'
     python: 3.6
     repo: etianen/django-python3-ldap
   distributions: sdist
