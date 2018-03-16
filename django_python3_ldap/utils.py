@@ -25,7 +25,7 @@ def clean_ldap_name(name):
     won't interfere with LDAP queries.
     """
     return re.sub(
-        r'[^a-zA-Z0-9 _\-.@]',
+        r'[^a-zA-Z0-9 _\-.@:*]',
         lambda c: "\\" + force_text(binascii.hexlify(c.group(0).encode("latin-1", errors="ignore"))).upper(),
         force_text(name),
     )
