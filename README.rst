@@ -117,6 +117,20 @@ For user-principal-name formats (e.g. "user@domain.com"):
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory_principal"
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "domain.com"
 
+Depending on how your Active Directory server is configured, the following additional settings may match your server
+better than the defaults used by django-python3-ldap:
+
+.. code:: python
+
+    LDAP_AUTH_USER_FIELDS = {
+        "username": "sAMAccountName",
+        "first_name": "givenName",
+        "last_name": "sn",
+        "email": "mail",
+    }
+
+    LDAP_AUTH_OBJECT_CLASS = "user"
+
 
 Can't get authentication to work?
 ---------------------------------
