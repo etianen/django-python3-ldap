@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.11.2
+------
+
+- Python 3.7 support.
+
+
 0.11.1
 ------
 
