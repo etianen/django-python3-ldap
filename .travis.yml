@@ -28,6 +28,8 @@ matrix:
   exclude:
     - python: 2.7
       env: DJANGO='>=2.0,<2.1'
+    - python: 3.7
+      env: DJANGO='>=1.11,<1.12'
 install:
   - pip install flake8 coverage django$DJANGO -e .
 script:
