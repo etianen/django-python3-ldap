@@ -148,6 +148,7 @@ def connection(**kwargs):
         c = ldap3.Connection(
             ldap3.Server(
                 settings.LDAP_AUTH_URL,
+                use_ssl=settings.LDAP_AUTH_USE_SSL,
                 allowed_referral_hosts=[("*", True)],
                 get_info=ldap3.NONE,
                 connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
