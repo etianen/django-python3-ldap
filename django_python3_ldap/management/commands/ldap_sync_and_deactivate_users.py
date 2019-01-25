@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.contrib.auth import get_user_model
 
 from django_python3_ldap import ldap
 from django_python3_ldap.conf import settings
-from django.contrib.auth.models import User
 
 
 class Command(BaseCommand):
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                     ))
                     user_list.append(user)
 
-            user_difference = list(set(User.objects.all()) - set(user_list))
+            user_difference = list(set(get_user_model().objects.all()) - set(user_list))
 
             for user in user_difference:
                 user.is_active = False
