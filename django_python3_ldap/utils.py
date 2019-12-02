@@ -6,7 +6,7 @@ import re
 import binascii
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils import six
+import six
 
 from django_python3_ldap.conf import settings
 
