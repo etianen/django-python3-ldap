@@ -19,6 +19,7 @@ setup(
         "django>=1.8",
         "ldap3>=2.5,<3",
         "pyasn1>=0.4.6,<0.5",
+        "six>=1.0",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
