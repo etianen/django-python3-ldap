@@ -6,7 +6,6 @@ import re
 import binascii
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils import six
 
 from django_python3_ldap.conf import settings
 
@@ -14,7 +13,7 @@ from django_python3_ldap.conf import settings
 def import_func(func):
     if callable(func):
         return func
-    elif isinstance(func, six.string_types):
+    elif isinstance(func, str):
         return import_string(func)
     raise AttributeError("Expected a function {0!r}".format(func))
 

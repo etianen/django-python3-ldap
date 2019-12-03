@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.conf import settings as django_settings
 from django.core.management import call_command, CommandError
-from django.utils import six
 
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
@@ -135,12 +134,12 @@ class TestLdap(TestCase):
         self.assertGreater(User.objects.count(), 0)
 
     def testSyncUsersCommandOutput(self):
-        out = StringIO() if six.PY3 else BytesIO()
+        out = StringIO()
         call_command("ldap_sync_users", verbosity=1, stdout=out)
         rows = out.getvalue().split("\n")[:-1]
         self.assertEqual(len(rows), User.objects.count())
         for row in rows:
-            six.assertRegex(self, row, r'^Synced [^\s]+$')
+            self.assertRegex(row, r'^Synced [^\s]+$')
 
     def testReSyncUsersDoesntRecreateUsers(self):
         call_command("ldap_sync_users", verbosity=0)
@@ -158,7 +157,7 @@ class TestLdap(TestCase):
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         # Promote the user.
-        call_command("ldap_promote", "test", stdout=StringIO() if six.PY3 else BytesIO())
+        call_command("ldap_promote", "test", stdout=StringIO())
         user = User.objects.get(username="test")
         self.assertTrue(user.is_staff)
         self.assertTrue(user.is_superuser)
