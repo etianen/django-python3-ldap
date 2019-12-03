@@ -139,7 +139,7 @@ class TestLdap(TestCase):
         rows = out.getvalue().split("\n")[:-1]
         self.assertEqual(len(rows), User.objects.count())
         for row in rows:
-            self.assertRegex(row, r'^Synced [^\s]+$')
+            self.assertRegex(row, r'^Synced ')
 
     def testReSyncUsersDoesntRecreateUsers(self):
         call_command("ldap_sync_users", verbosity=0)
