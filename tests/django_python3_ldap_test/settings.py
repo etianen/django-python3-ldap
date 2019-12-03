@@ -29,9 +29,9 @@ ALLOWED_HOSTS = []
 
 # LDAP auth settings.
 
-LDAP_AUTH_URL = os.environ.get("LDAP_AUTH_URL", "ldap://localhost:389")
+LDAP_AUTH_URL = "ldap://ldap.forumsys.com:389"
 
-LDAP_AUTH_SEARCH_BASE = os.environ.get("LDAP_AUTH_SEARCH_BASE", "")
+LDAP_AUTH_SEARCH_BASE = "dc=example,dc=com"
 
 AUTHENTICATION_BACKENDS = (
     "django_python3_ldap.auth.LDAPBackend",
@@ -40,9 +40,9 @@ AUTHENTICATION_BACKENDS = (
 
 # LDAP auth test settings.
 
-LDAP_AUTH_TEST_USER_USERNAME = os.environ.get("LDAP_AUTH_TEST_USER_USERNAME", "")
+LDAP_AUTH_TEST_USER_USERNAME = "tesla"
 
-LDAP_AUTH_TEST_USER_PASSWORD = os.environ.get("LDAP_AUTH_TEST_USER_PASSWORD", "")
+LDAP_AUTH_TEST_USER_PASSWORD = "password"
 
 
 # Application definition

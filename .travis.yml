@@ -8,15 +8,6 @@ python:
   - 2.7
 cache: pip
 env:
-  global:
-    # LDAP_AUTH_URL
-    - secure: "SQCh4GVbzQl8f5Fr8gbmHWfeVbVrbU+KuBPh3j72D6jjzRCLXEW6/tI7ttqE/HciR1e9u3AG7nO51W7IGitW26+SnOcrDnPDSqJ+6V4jzttlOAgNMN15G6yRQ7IRuA3p1og4IikYVlyO10buR4jCqPXZDqf9YxRRVn17b/1TNVs="
-    # LDAP_AUTH_SEARCH_BASE
-    - secure: "XITGh+4ssRZYa6odUhFhy8K2AY6P5aG8B7ZAtYeQYxeuW9Utd7xC++PxT+GJiu0xDIxxE2f5hjXZNERV0dI6y/9rc1y9r9G1GKadIAhDj4w2r3cP/2vZFeAnwpEjx5RqnWYoMYPwWfViOBVDjzuLYjwekKRIyZVcCw9es1xa6HM="
-    # LDAP_AUTH_TEST_USER_USERNAME
-    - secure: "WAr3C+Cp/FAcIOqbkV6WLxuvk1mjEOy3I1/uQLNDSunGI4LdX3qCldDY+mPTzhobiMJ1HenJOwquS5qnF2tmDBUlLzGkZCvEXPQQMXrzvZFBTspvSMC//BB7nF7WhqyObxZuZiiWUDM0wXdaFV5EA6LlUWRhCYtKPfMVbCpbmK8="
-    # LDAP_AUTH_TEST_USER_PASSWORD
-    - secure: "GP/Dry1ed/km5UDjUBT09fom6wq/165U8VeRvce8/D8fG8Jp92bMIlToAjXw0Lm4LcreA3Te5ErqogpDXG2mzof+st8kjwnThU0gGBe631F+CCKYCpo4EdmlMuQYDWTfi4IBxBGqfx7Ac/dxlidNN9X0qK7xgrECKudPA+6DGZg="
   matrix:
     - DJANGO='>=3.0,<3.1'
     - DJANGO='>=2.2,<3.0'

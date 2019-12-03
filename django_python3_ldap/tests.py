@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from unittest import skipUnless
-from io import StringIO, BytesIO
+from io import StringIO
 
 from django.test import TestCase
 from django.contrib.auth import authenticate
