@@ -1,7 +1,7 @@
 django-python3-ldap
 ===================
 
-**django-python3-ldap** provides a Django LDAP user authentication backend for Python 2 and 3.
+**django-python3-ldap** provides a Django LDAP user authentication backend.
 
 
 Features
@@ -10,7 +10,6 @@ Features
 - Authenticate users with an LDAP server.
 - Sync LDAP users with a local Django database.
 - Supports custom Django user models.
-- Works in Python 2 and 3!
 
 
 Installation
