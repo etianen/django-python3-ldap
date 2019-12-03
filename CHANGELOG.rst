@@ -7,6 +7,7 @@ django-python3-ldap changelog
 - Django 3.0 compatibility.
 - Improved cleanup of LDAP connections that fail initial bind.
 - Updated `ldap3` and `pyasn1` dependencies.
+- Dropped Python 2.7 support.
 
 
 0.11.2
