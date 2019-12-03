@@ -138,11 +138,6 @@ def connection(**kwargs):
     if kwargs:
         password = kwargs.pop("password")
         username = format_username(kwargs)
-    # Configure the connection.
-    if settings.LDAP_AUTH_USE_TLS:
-        auto_bind = ldap3.AUTO_BIND_TLS_BEFORE_BIND
-    else:
-        auto_bind = ldap3.AUTO_BIND_NO_TLS
     # Connect.
     try:
         c = ldap3.Connection(
@@ -154,7 +149,7 @@ def connection(**kwargs):
             ),
             user=username,
             password=password,
-            auto_bind=auto_bind,
+            auto_bind=False,
             raise_exceptions=True,
             receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
         )
@@ -162,28 +157,32 @@ def connection(**kwargs):
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
         yield None
         return
-    # If the settings specify an alternative username and password for querying, rebind as that.
-    if (
-        (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
-        (
-            settings.LDAP_AUTH_CONNECTION_USERNAME != username or
-            settings.LDAP_AUTH_CONNECTION_PASSWORD != password
-        )
-    ):
-        User = get_user_model()
-        try:
+    # Configure.
+    try:
+        # Start TLS, if requested.
+        if settings.LDAP_AUTH_USE_TLS:
+            c.start_tls(read_server_info=False)
+        # Perform initial authentication bind.
+        c.bind(read_server_info=True)
+        # If the settings specify an alternative username and password for querying, rebind as that.
+        if (
+            (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
+            (
+                settings.LDAP_AUTH_CONNECTION_USERNAME != username or
+                settings.LDAP_AUTH_CONNECTION_PASSWORD != password
+            )
+        ):
+            User = get_user_model()
             c.rebind(
                 user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
                 password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
             )
-        except LDAPException as ex:
-            logger.warning("LDAP rebind failed: {ex}".format(ex=ex))
-            yield None
-            return
-    # Return the connection.
-    logger.info("LDAP connect succeeded")
-    try:
+        # Return the connection.
+        logger.info("LDAP connect succeeded")
         yield Connection(c)
+    except LDAPException as ex:
+        logger.warning("LDAP bind failed: {ex}".format(ex=ex))
+        yield None
     finally:
         c.unbind()
 
