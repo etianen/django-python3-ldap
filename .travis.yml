@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 dist: xenial
 language: python
 python:
@@ -18,16 +18,16 @@ env:
     # LDAP_AUTH_TEST_USER_PASSWORD
     - secure: "GP/Dry1ed/km5UDjUBT09fom6wq/165U8VeRvce8/D8fG8Jp92bMIlToAjXw0Lm4LcreA3Te5ErqogpDXG2mzof+st8kjwnThU0gGBe631F+CCKYCpo4EdmlMuQYDWTfi4IBxBGqfx7Ac/dxlidNN9X0qK7xgrECKudPA+6DGZg="
   matrix:
+    - DJANGO='>=3.0,<3.1'
+    - DJANGO='>=2.2,<3.0'
+    - DJANGO='>=2.1,<2.2'
     - DJANGO='>=2.0,<2.1'
     - DJANGO='>=1.11,<1.12'
-    - DJANGO='>=1.10,<1.11'
-    - DJANGO='>=1.9,<1.10'
-    - DJANGO='>=1.8,<1.9'
 matrix:
   fast_finish: true
   exclude:
-    - python: 2.7
-      env: DJANGO='>=2.0,<2.1'
+    - python: 3.8
+      env: DJANGO='>=1.11,<1.12'
     - python: 3.7
       env: DJANGO='>=1.11,<1.12'
 install:
@@ -44,8 +44,8 @@ deploy:
     secure: e6HaAoVTzvCuBGLk9gkPxMgzYHS/HB7TLxZaqvicVIKRRl9IOGfyNzufU4wa8kUAN0YlDnFk6SYVn2bpsQoctKGWCFdo9BFGOpayGcllrF8ONa+HnB0g9rnu0kRluGeH7SZG7MVJoWYaIKG/MAUUtlxl9uwC2zaO8Cq4zASrJgI=
   on:
     tags: true
-    condition: $DJANGO = '>=2.0,<2.1'
-    python: 3.7
+    condition: $DJANGO = '>=3.0,<3.1'
+    python: 3.8
     repo: etianen/django-python3-ldap
   distributions: sdist
 notifications:

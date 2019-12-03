@@ -16,7 +16,7 @@ setup(
     url="https://github.com/etianen/django-python3-ldap",
     packages=find_packages(),
     install_requires=[
-        "django>=1.8",
+        "django>=1.11",
         "ldap3>=2.5,<3",
         "pyasn1>=0.4.6,<0.5",
     ],
@@ -27,9 +27,9 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Framework :: Django",
     ],
 )
