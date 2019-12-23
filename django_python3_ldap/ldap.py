@@ -195,7 +195,7 @@ def authenticate(*args, **kwargs):
     The user identifier should be keyword arguments matching the fields
     in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
-    password = kwargs.pop("password")
+    password = kwargs.pop("password", None)
     # Check that this is valid login data.
     if not password or frozenset(kwargs.keys()) != frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS):
         return None
