@@ -89,6 +89,9 @@ Available settings
     LDAP_AUTH_CONNECT_TIMEOUT = None
     LDAP_AUTH_RECEIVE_TIMEOUT = None
 
+    # Set authentication type on the underlying `ldap3` library.
+    LDAP_AUTH_AUTHENTICATION = None
+
 
 Microsoft Active Directory support
 ----------------------------------
@@ -129,6 +132,7 @@ better than the defaults used by django-python3-ldap:
     }
 
     LDAP_AUTH_OBJECT_CLASS = "user"
+    LDAP_AUTH_AUTHENTICATION = "NTLM"
 
 
 Can't get authentication to work?

@@ -149,6 +149,7 @@ def connection(**kwargs):
             ),
             user=username,
             password=password,
+            authentication=settings.LDAP_AUTH_AUTHENTICATION,
             auto_bind=False,
             raise_exceptions=True,
             receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,

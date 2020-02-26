@@ -125,5 +125,10 @@ class LazySettings(object):
         default=None
     )
 
+    LDAP_AUTH_AUTHENTICATION = LazySetting(
+        name="LDAP_AUTH_AUTHENTICATION",
+        default=None
+    )
+
 
 settings = LazySettings(settings)
