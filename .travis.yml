@@ -5,6 +5,10 @@ python:
   - 3.8
   - 3.7
   - 3.6
+arch:
+  - amd64
+  - ppc64le
+
 cache: pip
 env:
   matrix:
