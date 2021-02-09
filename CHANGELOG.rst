@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.11.4
+------
+
+- Fix error when using ldap auth backend with other authentication backends (@leavest).
+
+
 0.11.3
 ------
 
