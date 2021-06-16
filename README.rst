@@ -60,8 +60,9 @@ Available settings
     # Use this to customize how data loaded from LDAP is saved to the User model.
     LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
 
-    # Path to a callable that takes a user model and a dict of {ldap_field_name: [value]},
-    # and saves any additional user relationships based on the LDAP data.
+    # Path to a callable that takes a user model, a dict of {ldap_field_name: [value]}
+    # a LDAP connection object (to allow further lookups), and saves any additional
+    # user relationships based on the LDAP data.
     # Use this to customize how data loaded from LDAP is saved to User model relations.
     # For customizing non-related User model fields, use LDAP_AUTH_CLEAN_USER_DATA.
     LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"

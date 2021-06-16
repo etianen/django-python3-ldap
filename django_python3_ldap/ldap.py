@@ -71,7 +71,7 @@ class Connection(object):
             user.set_unusable_password()
             user.save()
         # Update relations
-        import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
+        import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes, self._connection)
         # All done!
         logger.info("LDAP user lookup succeeded")
         return user
