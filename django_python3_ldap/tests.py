@@ -167,9 +167,11 @@ class TestLdap(TestCase):
             call_command("ldap_promote", "missing_user", verbosity=0)
 
     def testSyncUserRelations(self):
-        def check_sync_user_relation(user, data):
+        def check_sync_user_relation(user, data, connection):
             # id have been created
             self.assertIsNotNone(user.id)
+            # connection was passed
+            self.assertIsNotNone(connection)
             # model is saved
             self.assertEqual(user.username, User.objects.get(pk=user.id).username)
             # save all groups
