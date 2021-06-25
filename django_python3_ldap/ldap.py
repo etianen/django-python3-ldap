@@ -197,7 +197,11 @@ def authenticate(*args, **kwargs):
     """
     password = kwargs.pop("password", None)
     # Check that this is valid login data.
-    if not password or frozenset(kwargs.keys()) != frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS):
+    if not password:
+        logger.warning("invalid login data: no password")
+        return None
+    if frozenset(kwargs.keys()) != frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS):
+        logger.warning("invalid login data: LDAP_AUTH_USER_LOOKUP_FIELDS")
         return None
     # Connect to LDAP.
     with connection(password=password, **kwargs) as c:
