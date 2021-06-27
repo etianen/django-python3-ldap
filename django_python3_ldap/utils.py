@@ -107,7 +107,7 @@ def format_username_active_directory_principal(model_fields):
     return username
 
 
-def sync_user_relations(user, ldap_attributes, ldap_connection):
+def sync_user_relations(user, ldap_attributes, *, connection=None, dn=None):
     # do nothing by default
     pass
 

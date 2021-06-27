@@ -132,6 +132,30 @@ better than the defaults used by django-python3-ldap:
     LDAP_AUTH_OBJECT_CLASS = "user"
 
 
+Sync User Relations
+-------------------
+
+As part of the user authentication process, django-python3-ldap calls a function specified by the
+LDAP_AUTH_SYNC_USER_RELATIONS configuraton item.  This function can be used for making additional
+updates to the user database (for example updaing the groups the user is a member of), or getting
+further information from the LDAP server.
+
+The signature of the called function is:-
+
+.. code:: python
+
+    def sync_user_relations(user, ldap_attributes, *, connection=None, dn=None):
+
+In versions up to 0.11.4 just two parameters were passed - a Django user model object, and a dict
+of attributes.  Subsequent versions pass additional parameters as keyword only parameters if the
+sync_user_relations support those named parameters.
+
+The additional parameters are:-
+
+- ``connection`` - the LDAP connection object
+- ``dn`` - the DN (Distinguished Name) of the LDAP matched user
+
+
 Can't get authentication to work?
 ---------------------------------
 
