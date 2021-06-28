@@ -146,14 +146,12 @@ The signature of the called function is:-
 
     def sync_user_relations(user, ldap_attributes, *, connection=None, dn=None):
 
-In versions up to 0.11.4 just two parameters were passed - a Django user model object, and a dict
-of attributes.  Subsequent versions pass additional parameters as keyword only parameters if the
-sync_user_relations support those named parameters.
+The parameters are:-
 
-The additional parameters are:-
-
-- ``connection`` - the LDAP connection object
-- ``dn`` - the DN (Distinguished Name) of the LDAP matched user
+- ``user`` - a Django user model object
+- ``ldap_attributes`` - a dict of LDAP attributes
+- ``connection`` - the LDAP connection object (optional keyword only parameter)
+- ``dn`` - the DN (Distinguished Name) of the LDAP matched user (optional keyword only parameter)
 
 
 Can't get authentication to work?
