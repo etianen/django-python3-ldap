@@ -167,6 +167,32 @@ class TestLdap(TestCase):
             call_command("ldap_promote", "missing_user", verbosity=0)
 
     def testSyncUserRelations(self):
+        def check_sync_user_relation(user, data, *, connection=None, dn=None):
+            # id have been created
+            self.assertIsNotNone(user.id)
+            # connection was passed
+            self.assertIsNotNone(connection)
+            # dn was passed
+            self.assertIsNotNone(dn)
+            # model is saved
+            self.assertEqual(user.username, User.objects.get(pk=user.id).username)
+            # save all groups
+            self.assertIn('cn', data)
+            ldap_groups = list(data.get('memberOf', ()))
+            ldap_groups.append('default_group')
+            for group in ldap_groups:
+                user.groups.create(name=group)
+
+        with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS=check_sync_user_relation):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertGreaterEqual(user.groups.count(), 1)
+            self.assertEqual(user.groups.filter(name='default_group').count(), 1)
+
+    def testOldSyncUserRelations(self):
         def check_sync_user_relation(user, data):
             # id have been created
             self.assertIsNotNone(user.id)

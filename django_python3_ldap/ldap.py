@@ -5,6 +5,7 @@ Low-level LDAP hooks.
 import ldap3
 from ldap3.core.exceptions import LDAPException
 import logging
+from inspect import getfullargspec
 from contextlib import contextmanager
 from django.contrib.auth import get_user_model
 from django_python3_ldap.conf import settings
@@ -71,7 +72,18 @@ class Connection(object):
             user.set_unusable_password()
             user.save()
         # Update relations
-        import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)(user, attributes)
+        sync_user_relations_func = import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)
+        sync_user_relations_arginfo = getfullargspec(sync_user_relations_func)
+        args = {}  # additional keyword arguments
+        for argname in sync_user_relations_arginfo.kwonlyargs:
+            if argname == "connection":
+                args["connection"]=self._connection
+            elif argname == "dn":
+                args["dn"]=user_data.get("dn")
+            else:
+                raise TypeError(f"Unknown kw argument {argname} in signature for LDAP_AUTH_SYNC_USER_RELATIONS")
+        # call sync_user_relations_func() with original args plus supported named extras
+        sync_user_relations_func(user, attributes, **args)
         # All done!
         logger.info("LDAP user lookup succeeded")
         return user
