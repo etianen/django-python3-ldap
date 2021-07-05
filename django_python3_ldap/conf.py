@@ -70,6 +70,11 @@ class LazySettings(object):
         ),
     )
 
+    LDAP_AUTH_USER_USERNAME_FIELD = LazySetting(
+        name="LDAP_AUTH_USER_USERNAME_FIELD",
+        default="username",
+    )
+
     LDAP_AUTH_CLEAN_USER_DATA = LazySetting(
         name="LDAP_AUTH_CLEAN_USER_DATA",
         default="django_python3_ldap.utils.clean_user_data",

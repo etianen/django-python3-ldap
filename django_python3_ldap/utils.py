@@ -84,7 +84,7 @@ def format_username_active_directory(model_fields):
     Formats a user identifier into a username suitable for
     binding to an Active Directory server.
     """
-    username = model_fields["username"]
+    username = model_fields[settings.LDAP_AUTH_USER_USERNAME_FIELD]
     if settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN:
         username = "{domain}\\{username}".format(
             domain=settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN,
