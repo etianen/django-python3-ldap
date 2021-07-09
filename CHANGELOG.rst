@@ -1,6 +1,13 @@
 django-python3-ldap changelog
 =============================
 
+0.12.0
+------
+
+- Added ``connection`` and ``dn`` parameters to the ``LDAP_AUTH_SYNC_USER_RELATIONS`` callback (@nigelm).
+  See: https://github.com/etianen/django-python3-ldap#sync-user-relations
+
+
 0.11.4
 ------
 
