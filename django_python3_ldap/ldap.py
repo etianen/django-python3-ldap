@@ -77,9 +77,9 @@ class Connection(object):
         args = {}  # additional keyword arguments
         for argname in sync_user_relations_arginfo.kwonlyargs:
             if argname == "connection":
-                args["connection"]=self._connection
+                args["connection"] = self._connection
             elif argname == "dn":
-                args["dn"]=user_data.get("dn")
+                args["dn"] = user_data.get("dn")
             else:
                 raise TypeError(f"Unknown kw argument {argname} in signature for LDAP_AUTH_SYNC_USER_RELATIONS")
         # call sync_user_relations_func() with original args plus supported named extras
