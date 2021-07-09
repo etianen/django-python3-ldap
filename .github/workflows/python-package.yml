@@ -35,6 +35,3 @@ jobs:
       run: |
         coverage run tests/manage.py test django_python3_ldap
         coverage report
-    - name: Build docs
-      run: |
-        (cd docs && sphinx-build -n -W . _build)
