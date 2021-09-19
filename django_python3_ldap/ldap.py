@@ -8,7 +8,6 @@ import logging
 from inspect import getfullargspec
 from contextlib import contextmanager
 from django.contrib.auth import get_user_model
-from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
 
 
@@ -21,7 +20,7 @@ class Connection(object):
     A connection to an LDAP server.
     """
 
-    def __init__(self, connection):
+    def __init__(self, connection, params, **kwargs):
         """
         Creates the LDAP connection.
 
@@ -29,6 +28,7 @@ class Connection(object):
         manager handles initialization.
         """
         self._connection = connection
+        self._params = params
 
     def _get_or_create_user(self, user_data):
         """
@@ -52,15 +52,15 @@ class Connection(object):
                 attributes[attribute_name]
             )
             for field_name, attribute_name
-            in settings.LDAP_AUTH_USER_FIELDS.items()
+            in self._params.LDAP_AUTH_USER_FIELDS.items()
             if attribute_name in attributes
         }
-        user_fields = import_func(settings.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
+        user_fields = import_func(self._params.LDAP_AUTH_CLEAN_USER_DATA)(user_fields)
         # Create the user lookup.
         user_lookup = {
             field_name: user_fields.pop(field_name, "")
             for field_name
-            in settings.LDAP_AUTH_USER_LOOKUP_FIELDS
+            in self._params.LDAP_AUTH_USER_LOOKUP_FIELDS
         }
         # Update or create the user.
         user, created = User.objects.update_or_create(
@@ -72,7 +72,7 @@ class Connection(object):
             user.set_unusable_password()
             user.save()
         # Update relations
-        sync_user_relations_func = import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)
+        sync_user_relations_func = import_func(self._params.LDAP_AUTH_SYNC_USER_RELATIONS)
         sync_user_relations_arginfo = getfullargspec(sync_user_relations_func)
         args = {}  # additional keyword arguments
         for argname in sync_user_relations_arginfo.kwonlyargs:
@@ -94,7 +94,7 @@ class Connection(object):
         users in the LDAP database.
         """
         paged_entries = self._connection.extend.standard.paged_search(
-            search_base=settings.LDAP_AUTH_SEARCH_BASE,
+            search_base=self._params.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter({}),
             search_scope=ldap3.SUBTREE,
             attributes=ldap3.ALL_ATTRIBUTES,
@@ -113,11 +113,11 @@ class Connection(object):
         Returns the user with the given identifier.
 
         The user identifier should be keyword arguments matching the fields
-        in settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
+        in self._params.LDAP_AUTH_USER_LOOKUP_FIELDS.
         """
         # Search the LDAP database.
         if self._connection.search(
-            search_base=settings.LDAP_AUTH_SEARCH_BASE,
+            search_base=self._params.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter(kwargs),
             search_scope=ldap3.SUBTREE,
             attributes=ldap3.ALL_ATTRIBUTES,
@@ -130,15 +130,15 @@ class Connection(object):
 
 
 @contextmanager
-def connection(**kwargs):
+def connection(params, **kwargs):
     """
     Creates and returns a connection to the LDAP server.
 
     The user identifier, if given, should be keyword arguments matching the fields
-    in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
+    in params.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
     # Format the DN for the username.
-    format_username = import_func(settings.LDAP_AUTH_FORMAT_USERNAME)
+    format_username = import_func(params.LDAP_AUTH_FORMAT_USERNAME)
     kwargs = {
         key: value
         for key, value
@@ -154,16 +154,16 @@ def connection(**kwargs):
     try:
         c = ldap3.Connection(
             ldap3.Server(
-                settings.LDAP_AUTH_URL,
+                params.LDAP_AUTH_URL,
                 allowed_referral_hosts=[("*", True)],
                 get_info=ldap3.NONE,
-                connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
+                connect_timeout=params.LDAP_AUTH_CONNECT_TIMEOUT,
             ),
             user=username,
             password=password,
             auto_bind=False,
             raise_exceptions=True,
-            receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
+            receive_timeout=params.LDAP_AUTH_RECEIVE_TIMEOUT,
         )
     except LDAPException as ex:
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
@@ -172,26 +172,26 @@ def connection(**kwargs):
     # Configure.
     try:
         # Start TLS, if requested.
-        if settings.LDAP_AUTH_USE_TLS:
+        if params.LDAP_AUTH_USE_TLS:
             c.start_tls(read_server_info=False)
         # Perform initial authentication bind.
         c.bind(read_server_info=True)
-        # If the settings specify an alternative username and password for querying, rebind as that.
+        # If the params specify an alternative username and password for querying, rebind as that.
         if (
-            (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
+            (params.LDAP_AUTH_CONNECTION_USERNAME or params.LDAP_AUTH_CONNECTION_PASSWORD) and
             (
-                settings.LDAP_AUTH_CONNECTION_USERNAME != username or
-                settings.LDAP_AUTH_CONNECTION_PASSWORD != password
+                params.LDAP_AUTH_CONNECTION_USERNAME != username or
+                params.LDAP_AUTH_CONNECTION_PASSWORD != password
             )
         ):
             User = get_user_model()
             c.rebind(
-                user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
-                password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
+                user=format_username({User.USERNAME_FIELD: params.LDAP_AUTH_CONNECTION_USERNAME}),
+                password=params.LDAP_AUTH_CONNECTION_PASSWORD,
             )
         # Return the connection.
         logger.info("LDAP connect succeeded")
-        yield Connection(c)
+        yield Connection(c, params, **kwargs)
     except LDAPException as ex:
         logger.warning("LDAP bind failed: {ex}".format(ex=ex))
         yield None
@@ -199,20 +199,20 @@ def connection(**kwargs):
         c.unbind()
 
 
-def authenticate(*args, **kwargs):
+def authenticate(params, *args, **kwargs):
     """
     Authenticates with the LDAP server, and returns
     the corresponding Django user instance.
 
     The user identifier should be keyword arguments matching the fields
-    in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
+    in params.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
     password = kwargs.pop("password", None)
     # Check that this is valid login data.
-    if not password or frozenset(kwargs.keys()) != frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS):
+    if not password or frozenset(kwargs.keys()) != frozenset(params.LDAP_AUTH_USER_LOOKUP_FIELDS):
         return None
     # Connect to LDAP.
-    with connection(password=password, **kwargs) as c:
+    with connection(params=params, password=password, **kwargs) as c:
         if c is None:
             return None
         return c.get_user(**kwargs)

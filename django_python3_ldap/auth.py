@@ -5,6 +5,7 @@ Django authentication backend.
 from django.contrib.auth.backends import ModelBackend
 
 from django_python3_ldap import ldap
+from django_python3_ldap.conf import settings
 
 
 class LDAPBackend(ModelBackend):
@@ -20,4 +21,4 @@ class LDAPBackend(ModelBackend):
     supports_inactive_user = False
 
     def authenticate(self, *args, **kwargs):
-        return ldap.authenticate(*args, **kwargs)
+        return ldap.authenticate(settings, *args, **kwargs)
