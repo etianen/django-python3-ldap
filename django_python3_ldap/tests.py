@@ -81,6 +81,15 @@ class TestLdap(TestCase):
         )
         self.assertEqual(user, None)
 
+    def testAuthenticateWithAdditonalKwargsUserSuccess(self):
+        user = authenticate(
+            username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            another_kwarg="whatever",
+        )
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
+
     def testRepeatedUserAuthenticationDoestRecreateUsers(self):
         user_1 = authenticate(
             username=settings.LDAP_AUTH_TEST_USER_USERNAME,
