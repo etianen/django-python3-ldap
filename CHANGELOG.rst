@@ -1,6 +1,13 @@
 django-python3-ldap changelog
 =============================
 
+0.12.1
+------
+
+- Added support for additional (ignored) keyword arguments to ``authenticate(...)``. This allows use with other
+  authentication backends that require different keyword arguments (@stinovlas).
+
+
 0.12.0
 ------
 
