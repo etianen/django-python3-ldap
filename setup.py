@@ -6,7 +6,7 @@ from django_python3_ldap import __version__
 version_str = ".".join(str(n) for n in __version__)
 
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.rst", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 
