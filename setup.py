@@ -6,11 +6,16 @@ from django_python3_ldap import __version__
 version_str = ".".join(str(n) for n in __version__)
 
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+
 setup(
     name="django-python3-ldap",
     version=version_str,
     license="BSD",
     description="Django LDAP user authentication backend for Python 3.",
+    long_description=long_description,
     author="Dave Hall",
     author_email="dave@etianen.com",
     url="https://github.com/etianen/django-python3-ldap",
