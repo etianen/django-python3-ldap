@@ -100,6 +100,11 @@ class LazySettings(object):
         default="",
     )
 
+    LDAP_AUTH_TEST_USER_EMAIL = LazySetting(
+        name="LDAP_AUTH_TEST_USER_EMAIL",
+        default=""
+    )
+
     LDAP_AUTH_TEST_USER_PASSWORD = LazySetting(
         name="LDAP_AUTH_TEST_USER_PASSWORD",
         default="",

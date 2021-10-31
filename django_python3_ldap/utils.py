@@ -4,6 +4,8 @@ Some useful LDAP utilities.
 
 import re
 import binascii
+import itertools
+
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 
@@ -121,3 +123,19 @@ def format_search_filters(ldap_fields):
         for field_name, field_value
         in ldap_fields.items()
     ]
+
+
+def chunk_lookup_args(*args):
+    """
+    Yields the given series of arguments as chunks, formatted as dictionaries, which represent field lookups
+    according to the LDAP_AUTH_USER_LOOKUP_FIELDS setting.
+
+    Based on the itertools grouper recipe: https://docs.python.org/3/library/itertools.html#itertools-recipes
+    """
+    fields_len = len(settings.LDAP_AUTH_USER_LOOKUP_FIELDS)
+    fields = [iter(args)] * fields_len
+    for chunk in itertools.zip_longest(*fields, fillvalue=None):
+        lookup = {}
+        for i in range(fields_len):
+            lookup[settings.LDAP_AUTH_USER_LOOKUP_FIELDS[i]] = chunk[i]
+        yield lookup
