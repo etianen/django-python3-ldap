@@ -19,7 +19,7 @@ Installation
 2. Add ``'django_python3_ldap'`` to your ``INSTALLED_APPS`` setting.
 3. Set your ``AUTHENTICATION_BACKENDS`` setting to ``("django_python3_ldap.auth.LDAPBackend",)``
 4. Configure the settings for your LDAP server (see Available settings, below).
-5. Optionally, run ``./manage.py ldap_sync_users`` to perform an initial sync of LDAP users.
+5. Optionally, run ``./manage.py ldap_sync_users`` (or ``./manage.py ldap_sync_users <list of user lookups>``) to perform an initial sync of LDAP users.
 6. Optionally, run ``./manage.py ldap_promote <username>`` to grant superuser admin access to a given user.
 
 

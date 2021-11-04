@@ -42,6 +42,8 @@ AUTHENTICATION_BACKENDS = (
 
 LDAP_AUTH_TEST_USER_USERNAME = "tesla"
 
+LDAP_AUTH_TEST_USER_EMAIL = "tesla@ldap.forumsys.com"
+
 LDAP_AUTH_TEST_USER_PASSWORD = "password"
 
 

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless, skip
 from io import StringIO
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.conf import settings as django_settings
@@ -140,6 +140,20 @@ class TestLdap(TestCase):
     def testSyncUsersCreatesUsers(self):
         call_command("ldap_sync_users", verbosity=0)
         self.assertGreater(User.objects.count(), 0)
+
+    def testSyncUserWithLookup(self):
+        call_command("ldap_sync_users", settings.LDAP_AUTH_TEST_USER_USERNAME, verbosity=0)
+        self.assertEqual(User.objects.filter(username=settings.LDAP_AUTH_TEST_USER_USERNAME).count(), 1)
+
+    @override_settings(LDAP_AUTH_USER_LOOKUP_FIELDS=('username', 'email'))
+    def testSyncUserWithMultipleLookups(self):
+        call_command(
+            "ldap_sync_users",
+            settings.LDAP_AUTH_TEST_USER_USERNAME,
+            settings.LDAP_AUTH_TEST_USER_EMAIL,
+            verbosity=0
+        )
+        self.assertEqual(User.objects.filter(username=settings.LDAP_AUTH_TEST_USER_USERNAME).count(), 1)
 
     def testSyncUsersCommandOutput(self):
         out = StringIO()
