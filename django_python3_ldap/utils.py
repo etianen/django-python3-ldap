@@ -125,7 +125,7 @@ def format_search_filters(ldap_fields):
     ]
 
 
-def chunk_lookup_args(*args):
+def group_lookup_args(*args):
     """
     Yields the given series of arguments as chunks, formatted as dictionaries, which represent field lookups
     according to the LDAP_AUTH_USER_LOOKUP_FIELDS setting.

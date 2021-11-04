@@ -4,7 +4,7 @@ from django.db import transaction
 
 from django_python3_ldap import ldap
 from django_python3_ldap.conf import settings
-from django_python3_ldap.utils import chunk_lookup_args
+from django_python3_ldap.utils import group_lookup_args
 
 
 class Command(BaseCommand):
@@ -22,12 +22,16 @@ class Command(BaseCommand):
 
     @staticmethod
     def _iter_synced_users(connection, lookups):
+        """
+        Iterates over synced users. If the list of lookups is empty, then all users are synced using iter_users.
+        However, if lookups are provided, get_user is used to sync each user found using the lookups.
+        """
         if len(lookups) < 1:
             for user in connection.iter_users():
                 yield user
         else:
-            for chunk in chunk_lookup_args(*lookups):
-                yield connection.get_user(**chunk)
+            for lookup in group_lookup_args(*lookups):
+                yield connection.get_user(**lookup)
 
     @transaction.atomic()
     def handle(self, *args, **kwargs):
