@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.13.0
+------
+
+- Allow syncing individual users with ``ldap_sync_users`` management command (@CristopherH95).
+
+
 0.12.1
 ------
 
