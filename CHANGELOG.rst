@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.13.1
+------
+
+- Django 4.0 compatibility (@sn1c).
+
+
 0.13.0
 ------
 
