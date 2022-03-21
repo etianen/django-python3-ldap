@@ -57,6 +57,20 @@ class TestLdap(TestCase):
             )
             self.assertEqual(user, None)
 
+    def testHasUserKwargsSuccess(self):
+        with connection() as c:
+            exist = c.has_user(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            )
+            self.assertEqual(exist, True)
+
+    def testHasUserKwargsIncorrectUsername(self):
+        with connection() as c:
+            exist = c.has_user(
+                username="bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
+            )
+            self.assertEqual(exist, False)
+
     # Authentication tests.
 
     def testAuthenticateUserSuccess(self):
