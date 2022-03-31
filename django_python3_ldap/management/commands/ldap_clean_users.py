@@ -18,7 +18,8 @@ class Command(BaseCommand):
             help='Purge instead of deactive local user models'
         )
 
-    def _remove(self, connection, user, purge):
+    @staticmethod
+    def _remove(user, purge):
         """
         Deactivate or purge a given local user
         """
@@ -59,9 +60,10 @@ class Command(BaseCommand):
                     User.USERNAME_FIELD: getattr(user, User.USERNAME_FIELD)
                 }
                 if connection.has_user(**user_kwargs):
+                    # User still exists on LDAP side
                     continue
-
-                self._remove(connection, user, purge)
+                # Clean user
+                self._remove(user, purge)
                 if verbosity >= 1:
                     self.stdout.write("{action} {user}".format(
                         action=('Purged' if purge else 'Deactivated'),
