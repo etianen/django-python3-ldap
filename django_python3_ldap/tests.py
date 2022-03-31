@@ -276,7 +276,7 @@ class TestLdap(TestCase):
         call_command("ldap_clean_users", verbosity=0)
         user_count_2 = User.objects.count()
         self.assertEqual(user_count_1, user_count_2)
-        self.assertEqual(User.objects.filter(
+        self.assertEqual(User.objects.get(
             username="nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME)).is_active, False)
 
     def testCleanUsersPurge(self):
@@ -293,6 +293,7 @@ class TestLdap(TestCase):
         self.assertGreater(user_count_1, user_count_2)
 
     def testCleanUsersCommandOutput(self):
+        # Test without purge
         out = StringIO()
         from django.contrib.auth import get_user_model
         User = get_user_model()
@@ -301,18 +302,22 @@ class TestLdap(TestCase):
             "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
             settings.LDAP_AUTH_TEST_USER_PASSWORD)
         user.save()
-        call_command("ldap_clean_users", verbosity=1)
+        call_command("ldap_clean_users", stdout=out, verbosity=1)
         rows = out.getvalue().split("\n")[:-1]
         self.assertEqual(len(rows), 1)
         for row in rows:
             self.assertRegex(row, r'^Deactivated ')
-
+        # Reset for next test
+        user.delete()
+        out.truncate(0)
+        out.seek(0)
+        # Test with purge
         user = User.objects.create_user(
             "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME),
             "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
             settings.LDAP_AUTH_TEST_USER_PASSWORD)
         user.save()
-        call_command("ldap_clean_users", verbosity=1, purge=True)
+        call_command("ldap_clean_users", stdout=out, verbosity=1, purge=True)
         rows = out.getvalue().split("\n")[:-1]
         self.assertEqual(len(rows), 1)
         for row in rows:
