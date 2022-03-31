@@ -12,13 +12,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'purge',
+            '-p',
+            '--purge',
             action='store_true',
             help='Purge instead of deactive local user models'
         )
 
-    @staticmethod
-    def _remove(connection, user, purge, verbosity):
+    def _remove(self, connection, user, purge, verbosity):
         """
         Deactivate or purge a given local user
         """
@@ -63,7 +63,10 @@ class Command(BaseCommand):
             for user in User.objects.all():
                 # For each local users
                 # Check if user still exist
-                if connection.has_user(user.get(User.USERNAME_FIELD, None)):
+                user_kwargs  = {
+                    User.USERNAME_FIELD: getattr(user, User.USERNAME_FIELD)
+                }
+                if connection.has_user(**user_kwargs):
                     continue
 
                 self._remove(connection, user, purge, verbosity)
