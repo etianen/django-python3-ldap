@@ -18,7 +18,7 @@ class Command(BaseCommand):
             help='Purge instead of deactive local user models'
         )
 
-    def _remove(self, connection, user, purge, verbosity):
+    def _remove(self, connection, user, purge):
         """
         Deactivate or purge a given local user
         """
@@ -26,10 +26,6 @@ class Command(BaseCommand):
             # Delete local user
             try:
                 user.delete()
-                if verbosity >= 1:
-                    self.stdout.write("Purged {user}".format(
-                        user=user,
-                    ))
             except Exception as e:
                 raise CommandError("Could not purge user {user}".format(
                     user=user,
@@ -39,10 +35,6 @@ class Command(BaseCommand):
             try:
                 user.is_active = False
                 user.save()
-                if verbosity >= 1:
-                    self.stdout.write("Deactivated {user}".format(
-                        user=user,
-                    ))
             except Exception as e:
                 raise CommandError("Could not deactivate user {user}".format(
                     user=user,
@@ -62,11 +54,16 @@ class Command(BaseCommand):
                 raise CommandError("Could not connect to LDAP server")
             for user in User.objects.all():
                 # For each local users
-                # Check if user still exist
+                # Check if user still exists
                 user_kwargs  = {
                     User.USERNAME_FIELD: getattr(user, User.USERNAME_FIELD)
                 }
                 if connection.has_user(**user_kwargs):
                     continue
 
-                self._remove(connection, user, purge, verbosity)
+                self._remove(connection, user, purge)
+                if verbosity >= 1:
+                    self.stdout.write("{action} {user}".format(
+                        action=('Purged' if purge else 'Deactivated'),
+                        user=user,
+                    ))
