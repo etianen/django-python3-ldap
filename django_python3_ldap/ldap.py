@@ -150,15 +150,21 @@ def connection(**kwargs):
     if kwargs:
         password = kwargs.pop("password")
         username = format_username(kwargs)
-    # Connect.
-    try:
-        c = ldap3.Connection(
-            ldap3.Server(
-                settings.LDAP_AUTH_URL,
+    # Build server pool
+    server_pool = ldap3.ServerPool(None, ldap3.RANDOM, active=True, exhaust=5)
+    auth_url = settings.LDAP_AUTH_URL
+    if not isinstance(auth_url, list):
+        auth_url = [auth_url]
+    for u in auth_url:
+        server_pool.add(ldap3.Server(u,
                 allowed_referral_hosts=[("*", True)],
                 get_info=ldap3.NONE,
                 connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
-            ),
+                ))
+    # Connect.
+    try:
+        c = ldap3.Connection(
+            server_pool,
             user=username,
             password=password,
             auto_bind=False,

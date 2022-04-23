@@ -35,7 +35,7 @@ class LazySettings(object):
 
     LDAP_AUTH_URL = LazySetting(
         name="LDAP_AUTH_URL",
-        default="ldap://localhost:389",
+        default=["ldap://localhost:389"],
     )
 
     LDAP_AUTH_USE_TLS = LazySetting(
