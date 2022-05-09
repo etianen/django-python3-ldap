@@ -156,11 +156,14 @@ def connection(**kwargs):
     if not isinstance(auth_url, list):
         auth_url = [auth_url]
     for u in auth_url:
-        server_pool.add(ldap3.Server(u,
+        server_pool.add(
+            ldap3.Server(
+                u,
                 allowed_referral_hosts=[("*", True)],
                 get_info=ldap3.NONE,
                 connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
-                ))
+            )
+        )
     # Connect.
     try:
         c = ldap3.Connection(
