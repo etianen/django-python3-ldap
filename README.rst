@@ -18,7 +18,7 @@ Installation
 1. Install using ``pip install django-python3-ldap``.
 2. Add ``'django_python3_ldap'`` to your ``INSTALLED_APPS`` setting.
 3. Set your ``AUTHENTICATION_BACKENDS`` setting to ``("django_python3_ldap.auth.LDAPBackend",)``
-4. Configure the settings for your LDAP server (see Available settings, below).
+4. Configure the settings for your LDAP server(s) (see Available settings, below).
 5. Optionally, run ``./manage.py ldap_sync_users`` (or ``./manage.py ldap_sync_users <list of user lookups>``) to perform an initial sync of LDAP users.
 6. Optionally, run ``./manage.py ldap_promote <username>`` to grant superuser admin access to a given user.
 
@@ -31,8 +31,8 @@ Available settings
 
 .. code:: python
 
-    # The URL of the LDAP server.
-    LDAP_AUTH_URL = "ldap://localhost:389"
+    # The URL of the LDAP server(s).  List multiple servers for high availability ServerPool connection.
+    LDAP_AUTH_URL = ["ldap://localhost:389"]
 
     # Initiate TLS on connection.
     LDAP_AUTH_USE_TLS = False
@@ -215,8 +215,8 @@ The returned list of search filters will be AND'd together to make the final sea
 How it works
 ------------
 
-When a user attempts to authenticate, a connection is made to the LDAP
-server, and the application attempts to bind using the provided username and password.
+When a user attempts to authenticate, a connection is made to one of the listed LDAP
+servers, and the application attempts to bind using the provided username and password.
 
 If the bind attempt is successful, the user details are loaded from the LDAP server
 and saved in a local Django ``User`` model. The local model is only created once,

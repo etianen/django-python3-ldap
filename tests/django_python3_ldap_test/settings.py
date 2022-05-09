@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 # LDAP auth settings.
 
-LDAP_AUTH_URL = "ldap://ldap.forumsys.com:389"
+LDAP_AUTH_URL = ["ldap://ldap.forumsys.com:389"]
 
 LDAP_AUTH_SEARCH_BASE = "dc=example,dc=com"
 
