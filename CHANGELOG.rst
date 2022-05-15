@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.14.0
+------
+
+- Added support for multiple LDAP servers to enable a high-availability server pool (@hho6643).
+
 0.13.1
 ------
 
