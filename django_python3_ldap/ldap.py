@@ -167,20 +167,21 @@ def connection(**kwargs):
     # Connect.
     try:
         # Include SSL / TLS, if requested.
+        connection_args = {
+            "user": username,
+            "password": password,
+            "auto_bind": False,
+            "raise_exceptions": True,
+            "receive_timeout": settings.LDAP_AUTH_RECEIVE_TIMEOUT,
+        }
         if settings.LDAP_AUTH_USE_TLS:
-            tls = ldap3.Tls(
+            connection_args["tls"] = ldap3.Tls(
                 ciphers='ALL',
                 version=settings.LDAP_AUTH_TLS_VERSION,
             )
-
         c = ldap3.Connection(
             server_pool,
-            user=username,
-            password=password,
-            auto_bind=False,
-            raise_exceptions=True,
-            receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
-            tls=tls,
+            **connection_args,
         )
     except LDAPException as ex:
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
