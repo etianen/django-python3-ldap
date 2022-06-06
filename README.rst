@@ -37,6 +37,10 @@ Available settings
     # Initiate TLS on connection.
     LDAP_AUTH_USE_TLS = False
 
+    # Specify which TLS version to use (Python 3.10 requires TLSv1 or higher)
+    import ssl
+    LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = "ou=people,dc=example,dc=com"
 

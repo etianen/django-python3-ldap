@@ -43,6 +43,11 @@ class LazySettings(object):
         default=False,
     )
 
+    LDAP_AUTH_TLS_VERSION = LazySetting(
+        name="LDAP_AUTH_TLS_VERSION",
+        default="SSLv3",
+    )
+
     LDAP_AUTH_SEARCH_BASE = LazySetting(
         name="LDAP_AUTH_SEARCH_BASE",
         default="ou=people,dc=example,dc=com",
