@@ -166,13 +166,22 @@ def connection(**kwargs):
         )
     # Connect.
     try:
+        # Include SSL / TLS, if requested.
+        connection_args = {
+            "user": username,
+            "password": password,
+            "auto_bind": False,
+            "raise_exceptions": True,
+            "receive_timeout": settings.LDAP_AUTH_RECEIVE_TIMEOUT,
+        }
+        if settings.LDAP_AUTH_USE_TLS:
+            connection_args["tls"] = ldap3.Tls(
+                ciphers='ALL',
+                version=settings.LDAP_AUTH_TLS_VERSION,
+            )
         c = ldap3.Connection(
             server_pool,
-            user=username,
-            password=password,
-            auto_bind=False,
-            raise_exceptions=True,
-            receive_timeout=settings.LDAP_AUTH_RECEIVE_TIMEOUT,
+            **connection_args,
         )
     except LDAPException as ex:
         logger.warning("LDAP connect failed: {ex}".format(ex=ex))
@@ -180,9 +189,6 @@ def connection(**kwargs):
         return
     # Configure.
     try:
-        # Start TLS, if requested.
-        if settings.LDAP_AUTH_USE_TLS:
-            c.start_tls(read_server_info=False)
         # Perform initial authentication bind.
         c.bind(read_server_info=True)
         # If the settings specify an alternative username and password for querying, rebind as that.
