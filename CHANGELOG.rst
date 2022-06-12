@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.15.0
+------
+
+- Allows overriding the SSL/TLS version (@FlipperPA).
+
 0.14.0
 ------
 
