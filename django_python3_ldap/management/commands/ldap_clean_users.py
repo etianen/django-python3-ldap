@@ -25,21 +25,35 @@ class Command(BaseCommand):
             help='A list of lookup values, matching the fields specified in LDAP_AUTH_USER_LOOKUP_FIELDS. '
                  'If this is not provided then ALL users are concerned.'
         )
+        parser.add_argument(
+            '--superuser',
+            action='store_true',
+            help='Handle superuser (by default, superusers are excluded)'
+        )
+        parser.add_argument(
+            '--staff',
+            action='store_true',
+            help='Handle staff user (by default,staff users are excluded)'
+        )
 
     @staticmethod
-    def _iter_local_users(User, lookups):
+    def _iter_local_users(User, lookups, superuser, staff):
         """
         Iterates over local users. If the list of lookups is empty, then all users are returned.
         However, if lookups are provided, User.object.get is used to clean each user found using the lookups.
+        Exclude or not superuser and or staff user.
         """
 
         if len(lookups) < 1:
-            for user in User.objects.all():
+            for user in User.objects.filter(is_superuser=superuser,
+                                            is_staff=staff):
                 yield user
         else:
             for lookup in group_lookup_args(*lookups):
                 try:
-                    yield User.objects.get(**lookup)
+                    yield User.objects.get(**lookup,
+                                           is_superuser=superuser,
+                                           is_staff=staff)
                 except Exception as e:
                     raise CommandError("Could not find user with lookup : {lookup}".format(
                         lookup=lookup,
@@ -74,6 +88,8 @@ class Command(BaseCommand):
         verbosity = int(kwargs.get("verbosity", 1))
         purge = kwargs.get('purge', False)
         lookups = kwargs.get('lookups', [])
+        superuser = kwargs.get('superuser', False)
+        staff = kwargs.get('staff', False)
         User = get_user_model()
         auth_kwargs = {
             User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME,
@@ -82,7 +98,7 @@ class Command(BaseCommand):
         with ldap.connection(**auth_kwargs) as connection:
             if connection is None:
                 raise CommandError("Could not connect to LDAP server")
-            for user in self._iter_local_users(User, lookups):
+            for user in self._iter_local_users(User, lookups, superuser, staff):
                 # For each local users
                 # Check if user still exists
                 user_kwargs  = {

@@ -282,8 +282,7 @@ class TestLdap(TestCase):
 
         ### Test with lookup
         # Reactivate user
-        user = User.objects.get(
-            username="nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME))
+        user = User.objects.get(username=_username)
         user.is_active = True
         user.save()
         # Create second user
@@ -315,6 +314,38 @@ class TestLdap(TestCase):
         except Exception as e:
             print(e)
 
+        ### Test with superuser
+        # Reactivate first user and promote to superuser
+        user = User.objects.get(username=_username)
+        user.is_active = True
+        user.is_superuser = True
+        user.save()
+        # Reactivate second user
+        user = User.objects.get(username=_usernameLookup)
+        user.is_active = True
+        user.save()
+        call_command("ldap_clean_users", superuser=False, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, False)
+        call_command("ldap_clean_users", superuser=True, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
+
+        ### Test with staff user
+        # Reactivate first user and promote to staff
+        user = User.objects.get(username=_username)
+        user.is_active = True
+        user.is_superuser = False
+        user.is_staff = True
+        user.save()
+        # Reactivate second user
+        user = User.objects.get(username=_usernameLookup)
+        user.is_active = True
+        user.save()
+        call_command("ldap_clean_users", staff=False, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, False)
+        call_command("ldap_clean_users", staff=True, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
 
     def testCleanUsersPurge(self):
         from django.contrib.auth import get_user_model
