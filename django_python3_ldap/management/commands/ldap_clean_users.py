@@ -4,6 +4,7 @@ from django.db import transaction
 
 from django_python3_ldap import ldap
 from django_python3_ldap.conf import settings
+from django_python3_ldap.utils import group_lookup_args
 
 
 class Command(BaseCommand):
@@ -17,6 +18,33 @@ class Command(BaseCommand):
             action='store_true',
             help='Purge instead of deactive local user models'
         )
+        parser.add_argument(
+            'lookups',
+            nargs='*',
+            type=str,
+            help='A list of lookup values, matching the fields specified in LDAP_AUTH_USER_LOOKUP_FIELDS. '
+                 'If this is not provided then ALL users are concerned.'
+        )
+
+    @staticmethod
+    def _iter_local_users(User, lookups):
+        """
+        Iterates over local users. If the list of lookups is empty, then all users are returned.
+        However, if lookups are provided, User.object.get is used to clean each user found using the lookups.
+        """
+
+        if len(lookups) < 1:
+            for user in User.objects.all():
+                yield user
+        else:
+            for lookup in group_lookup_args(*lookups):
+                try:
+                    yield User.objects.get(**lookup)
+                except Exception as e:
+                    raise CommandError("Could not find user with lookup : {lookup}".format(
+                        lookup=lookup,
+                    ))
+
 
     @staticmethod
     def _remove(user, purge):
@@ -45,6 +73,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         verbosity = int(kwargs.get("verbosity", 1))
         purge = kwargs.get('purge', False)
+        lookups = kwargs.get('lookups', [])
         User = get_user_model()
         auth_kwargs = {
             User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME,
@@ -53,7 +82,7 @@ class Command(BaseCommand):
         with ldap.connection(**auth_kwargs) as connection:
             if connection is None:
                 raise CommandError("Could not connect to LDAP server")
-            for user in User.objects.all():
+            for user in self._iter_local_users(User, lookups):
                 # For each local users
                 # Check if user still exists
                 user_kwargs  = {
