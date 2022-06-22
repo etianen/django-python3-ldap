@@ -156,17 +156,25 @@ def connection(**kwargs):
     if not isinstance(auth_url, list):
         auth_url = [auth_url]
     for u in auth_url:
+        # Include SSL / TLS, if requested.
+        server_args = {
+            "allowed_referral_hosts": [("*", True)],
+            "get_info": ldap3.NONE,
+            "connect_timeout": settings.LDAP_AUTH_CONNECT_TIMEOUT,
+        }
+        if settings.LDAP_AUTH_USE_TLS:
+            server_args["tls"] = ldap3.Tls(
+                ciphers="ALL",
+                version=settings.LDAP_AUTH_TLS_VERSION,
+            )
         server_pool.add(
             ldap3.Server(
                 u,
-                allowed_referral_hosts=[("*", True)],
-                get_info=ldap3.NONE,
-                connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
+                **server_args,
             )
         )
     # Connect.
     try:
-        # Include SSL / TLS, if requested.
         connection_args = {
             "user": username,
             "password": password,
@@ -174,11 +182,6 @@ def connection(**kwargs):
             "raise_exceptions": True,
             "receive_timeout": settings.LDAP_AUTH_RECEIVE_TIMEOUT,
         }
-        if settings.LDAP_AUTH_USE_TLS:
-            connection_args["tls"] = ldap3.Tls(
-                ciphers='ALL',
-                version=settings.LDAP_AUTH_TLS_VERSION,
-            )
         c = ldap3.Connection(
             server_pool,
             **connection_args,
