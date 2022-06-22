@@ -1,7 +1,7 @@
 """
 Settings used by django-python3.
 """
-from ssl import PROTOCOL_SSLv23
+from ssl import PROTOCOL_TLS
 
 from django.conf import settings
 
@@ -46,7 +46,7 @@ class LazySettings(object):
 
     LDAP_AUTH_TLS_VERSION = LazySetting(
         name="LDAP_AUTH_TLS_VERSION",
-        default=PROTOCOL_SSLv23,
+        default=PROTOCOL_TLS,
     )
 
     LDAP_AUTH_SEARCH_BASE = LazySetting(
