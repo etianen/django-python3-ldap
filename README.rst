@@ -1,7 +1,7 @@
 django-python3-ldap
 ===================
 
-**django-python3-ldap** provides a Django LDAP user authentication backend.
+**django-python3-ldap** provides a Django LDAP user authentication backend. Python 3.6+ is required.
 
 
 Features
