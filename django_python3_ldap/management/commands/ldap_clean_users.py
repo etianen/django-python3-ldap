@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import ProtectedError
 
 from django_python3_ldap import ldap
 from django_python3_ldap.conf import settings
@@ -54,11 +55,10 @@ class Command(BaseCommand):
                     yield User.objects.get(**lookup,
                                            is_superuser=superuser,
                                            is_staff=staff)
-                except Exception as e:
+                except User.DoesNotExist:
                     raise CommandError("Could not find user with lookup : {lookup}".format(
                         lookup=lookup,
                     ))
-
 
     @staticmethod
     def _remove(user, purge):
@@ -69,19 +69,15 @@ class Command(BaseCommand):
             # Delete local user
             try:
                 user.delete()
-            except Exception as e:
-                raise CommandError("Could not purge user {user}".format(
+            except ProtectedError as e:
+                raise CommandError("Could not purge user {user} : {e}".format(
                     user=user,
+                    e=e
                 ))
         else:
             # Deactivate local user
-            try:
-                user.is_active = False
-                user.save()
-            except Exception as e:
-                raise CommandError("Could not deactivate user {user}".format(
-                    user=user,
-                ))
+            user.is_active = False
+            user.save()
 
     @transaction.atomic()
     def handle(self, *args, **kwargs):
@@ -101,7 +97,7 @@ class Command(BaseCommand):
             for user in self._iter_local_users(User, lookups, superuser, staff):
                 # For each local users
                 # Check if user still exists
-                user_kwargs  = {
+                user_kwargs = {
                     User.USERNAME_FIELD: getattr(user, User.USERNAME_FIELD)
                 }
                 if connection.has_user(**user_kwargs):

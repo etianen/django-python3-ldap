@@ -262,9 +262,10 @@ class TestLdap(TestCase):
         with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS='django.contrib.auth.get_user_model'):
             self.assertTrue(callable(import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)))
 
-    # User cleaning.
-
     def testCleanUsersDeactivate(self):
+        """
+        ldap_clean_users management command test
+        """
         from django.contrib.auth import get_user_model
         User = get_user_model()
         _username = "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME)
@@ -280,7 +281,9 @@ class TestLdap(TestCase):
         self.assertEqual(user_count_1, user_count_2)
         self.assertEqual(User.objects.get(username=_username).is_active, False)
 
-        ### Test with lookup
+        """
+        Test with lookup
+        """
         # Reactivate user
         user = User.objects.get(username=_username)
         user.is_active = True
@@ -309,12 +312,12 @@ class TestLdap(TestCase):
         self.assertEqual(User.objects.get(username=_username).is_active, False)
         self.assertEqual(User.objects.get(username=_usernameLookup).is_active, True)
         # Lookup a non existing user (raise a CommandError)
-        try:
+        with self.assertRaises(CommandError):
             call_command("ldap_clean_users", 'doesnonexist', verbosity=0)
-        except Exception as e:
-            print(e)
 
-        ### Test with superuser
+        """
+        Test with superuser
+        """
         # Reactivate first user and promote to superuser
         user = User.objects.get(username=_username)
         user.is_active = True
@@ -330,7 +333,9 @@ class TestLdap(TestCase):
         call_command("ldap_clean_users", superuser=True, verbosity=0)
         self.assertEqual(User.objects.get(username=_username).is_active, False)
 
-        ### Test with staff user
+        """
+        Test with staff user
+        """
         # Reactivate first user and promote to staff
         user = User.objects.get(username=_username)
         user.is_active = True
@@ -348,6 +353,9 @@ class TestLdap(TestCase):
         self.assertEqual(User.objects.get(username=_username).is_active, False)
 
     def testCleanUsersPurge(self):
+        """
+        ldap_clean_users management command test with purge argument
+        """
         from django.contrib.auth import get_user_model
         User = get_user_model()
         user = User.objects.create_user(
