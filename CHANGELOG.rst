@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.15.2
+------
+
+- Added ``ldap_clean_users`` command (@jordiromera).
+
 0.15.1
 ------
 
