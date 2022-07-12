@@ -86,7 +86,7 @@ Available settings
 
     # The LDAP username and password of a user for querying the LDAP database for user
     # details. If None, then the authenticated user will be used for querying, and
-    # the `ldap_sync_users` command will perform an anonymous query.
+    # the `ldap_sync_users`, `ldap_clean_users` commands will perform an anonymous query.
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
@@ -156,6 +156,19 @@ The parameters are:-
 - ``ldap_attributes`` - a dict of LDAP attributes
 - ``connection`` - the LDAP connection object (optional keyword only parameter)
 - ``dn`` - the DN (Distinguished Name) of the LDAP matched user (optional keyword only parameter)
+
+
+Clean User
+----------
+
+When a LDAP user is removed from server it could be interresting to deactive or delete its local Django account
+to prevent unauthorized access.
+
+To do so run:
+
+    ``./manage.py ldap_clean_users`` (or ``./manage.py ldap_clean_users --purge``).
+
+It will deactivate all local users non declared on LDAP server. If ``--purge`` is specified, all local users will be deleted.
 
 
 Can't get authentication to work?

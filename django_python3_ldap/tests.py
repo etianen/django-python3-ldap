@@ -57,6 +57,20 @@ class TestLdap(TestCase):
             )
             self.assertEqual(user, None)
 
+    def testHasUserKwargsSuccess(self):
+        with connection() as c:
+            exist = c.has_user(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+            )
+            self.assertEqual(exist, True)
+
+    def testHasUserKwargsIncorrectUsername(self):
+        with connection() as c:
+            exist = c.has_user(
+                username="bad" + settings.LDAP_AUTH_TEST_USER_USERNAME,
+            )
+            self.assertEqual(exist, False)
+
     # Authentication tests.
 
     def testAuthenticateUserSuccess(self):
@@ -247,3 +261,154 @@ class TestLdap(TestCase):
 
         with self.settings(LDAP_AUTH_SYNC_USER_RELATIONS='django.contrib.auth.get_user_model'):
             self.assertTrue(callable(import_func(settings.LDAP_AUTH_SYNC_USER_RELATIONS)))
+
+    def testCleanUsersDeactivate(self):
+        """
+        ldap_clean_users management command test
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        _username = "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME)
+        user = User.objects.create_user(
+            _username,
+            "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        user_count_1 = User.objects.count()
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        call_command("ldap_clean_users", verbosity=0)
+        user_count_2 = User.objects.count()
+        self.assertEqual(user_count_1, user_count_2)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
+
+        """
+        Test with lookup
+        """
+        # Reactivate user
+        user = User.objects.get(username=_username)
+        user.is_active = True
+        user.save()
+        # Create second user
+        _usernameLookup = "nonldaplookup{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME)
+        user = User.objects.create_user(
+            _usernameLookup,
+            "nonldaplookup{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        user_count_1 = User.objects.count()
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, True)
+        # Clean second user
+        call_command("ldap_clean_users", _usernameLookup, verbosity=0)
+        user_count_2 = User.objects.count()
+        self.assertEqual(user_count_1, user_count_2)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, False)
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        # Reactivate second user
+        user = User.objects.get(username=_usernameLookup)
+        user.is_active = True
+        user.save()
+        # Clean first user
+        call_command("ldap_clean_users", _username, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, True)
+        # Lookup a non existing user (raise a CommandError)
+        with self.assertRaises(CommandError):
+            call_command("ldap_clean_users", 'doesnonexist', verbosity=0)
+
+        """
+        Test with superuser
+        """
+        # Reactivate first user and promote to superuser
+        user = User.objects.get(username=_username)
+        user.is_active = True
+        user.is_superuser = True
+        user.save()
+        # Reactivate second user
+        user = User.objects.get(username=_usernameLookup)
+        user.is_active = True
+        user.save()
+        call_command("ldap_clean_users", superuser=False, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, False)
+        call_command("ldap_clean_users", superuser=True, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
+
+        """
+        Test with staff user
+        """
+        # Reactivate first user and promote to staff
+        user = User.objects.get(username=_username)
+        user.is_active = True
+        user.is_superuser = False
+        user.is_staff = True
+        user.save()
+        # Reactivate second user
+        user = User.objects.get(username=_usernameLookup)
+        user.is_active = True
+        user.save()
+        call_command("ldap_clean_users", staff=False, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, True)
+        self.assertEqual(User.objects.get(username=_usernameLookup).is_active, False)
+        call_command("ldap_clean_users", staff=True, verbosity=0)
+        self.assertEqual(User.objects.get(username=_username).is_active, False)
+
+    def testCleanUsersPurge(self):
+        """
+        ldap_clean_users management command test with purge argument
+        """
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(
+            "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME),
+            "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        user_count_1 = User.objects.count()
+        call_command("ldap_clean_users", verbosity=0, purge=True)
+        user_count_2 = User.objects.count()
+        self.assertGreater(user_count_1, user_count_2)
+
+    def testCleanUsersCommandOutput(self):
+        # Test without purge
+        out = StringIO()
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(
+            "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME),
+            "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        call_command("ldap_clean_users", stdout=out, verbosity=1)
+        rows = out.getvalue().split("\n")[:-1]
+        self.assertEqual(len(rows), 1)
+        for row in rows:
+            self.assertRegex(row, r'^Deactivated ')
+        # Reset for next test
+        user.delete()
+        out.truncate(0)
+        out.seek(0)
+        # Test with purge
+        user = User.objects.create_user(
+            "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME),
+            "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        call_command("ldap_clean_users", stdout=out, verbosity=1, purge=True)
+        rows = out.getvalue().split("\n")[:-1]
+        self.assertEqual(len(rows), 1)
+        for row in rows:
+            self.assertRegex(row, r'^Purged ')
+
+    def testReCleanUsersDoesntRecreateUsers(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(
+            "nonldap{user}".format(user=settings.LDAP_AUTH_TEST_USER_USERNAME),
+            "nonldap{mail}".format(mail=settings.LDAP_AUTH_TEST_USER_EMAIL),
+            settings.LDAP_AUTH_TEST_USER_PASSWORD)
+        user.save()
+        call_command("ldap_clean_users", verbosity=0, purge=True)
+        user_count_1 = User.objects.count()
+        call_command("ldap_clean_users", verbosity=0, purge=True)
+        user_count_2 = User.objects.count()
+        self.assertEqual(user_count_1, user_count_2)
