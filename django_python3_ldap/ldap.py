@@ -202,6 +202,9 @@ def connection(**kwargs):
         return
     # Configure.
     try:
+        # Start TLS, if requested.
+        if settings.LDAP_AUTH_USE_TLS:
+            c.start_tls(read_server_info=False)
         # Perform initial authentication bind.
         c.bind(read_server_info=True)
         # If the settings specify an alternative username and password for querying, rebind as that.
