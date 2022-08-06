@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.15.3
+------
+
+- BUGFIX: TLS connection is not started even if `LDAP_AUTH_USE_TLS = True` (@githubuserx).
+
 0.15.2
 ------
 
