@@ -170,6 +170,7 @@ def connection(**kwargs):
         server_args = {
             "allowed_referral_hosts": [("*", True)],
             "get_info": ldap3.NONE,
+            "use_ssl": settings.LDAP_AUTH_USE_TLS,
             "connect_timeout": settings.LDAP_AUTH_CONNECT_TIMEOUT,
         }
         if settings.LDAP_AUTH_USE_TLS:
