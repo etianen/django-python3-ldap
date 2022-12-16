@@ -207,17 +207,21 @@ def connection(**kwargs):
             c.start_tls(read_server_info=False)
         # Perform initial authentication bind.
         c.bind(read_server_info=True)
+        User = get_user_model()
         # If the settings specify an alternative username and password for querying, rebind as that.
-        if (
-            (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
-            (
-                settings.LDAP_AUTH_CONNECTION_USERNAME != username or
-                settings.LDAP_AUTH_CONNECTION_PASSWORD != password
+        settings_username = (
+            format_username(
+                {User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}
             )
+            if settings.LDAP_AUTH_CONNECTION_USERNAME
+            else None
+        )
+        settings_password = settings.LDAP_AUTH_CONNECTION_PASSWORD
+        if (settings_username and settings_password) and (
+            settings_username != username or settings_password != password
         ):
-            User = get_user_model()
             c.rebind(
-                user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
+                user=settings_username,
                 password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
             )
         # Return the connection.
