@@ -217,12 +217,12 @@ def connection(**kwargs):
             else None
         )
         settings_password = settings.LDAP_AUTH_CONNECTION_PASSWORD
-        if (settings_username and settings_password) and (
+        if (settings_username or settings_password) and (
             settings_username != username or settings_password != password
         ):
             c.rebind(
                 user=settings_username,
-                password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
+                password=settings_password,
             )
         # Return the connection.
         logger.info("LDAP connect succeeded")

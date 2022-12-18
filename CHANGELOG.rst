@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.15.4
+------
+
+- BUGFIX: Fixing redundant rebind when `LDAP_AUTH_CONNECTION_USERNAME` matches the existing username (@gagantrivedi).
+
+
 0.15.3
 ------
 
