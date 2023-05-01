@@ -36,6 +36,7 @@ class Command(BaseCommand):
             action='store_true',
             help='Handle staff user (by default,staff users are excluded)'
         )
+        
 
     @staticmethod
     def _iter_local_users(User, lookups, superuser, staff):
