@@ -129,7 +129,7 @@ class Connection(object):
         in settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
         """
         # Search the LDAP database.
-        response = self._connection.search(
+        self._connection.search(
             search_base=settings.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter(kwargs),
             search_scope=ldap3.SUBTREE,
