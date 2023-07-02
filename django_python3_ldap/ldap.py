@@ -137,7 +137,7 @@ class Connection(object):
             get_operational_attributes=True,
             size_limit=1,
         )
-        return True if self._connection.response[0].get("attributes") else False
+        return bool(len(self._connection.response) > 0 and self._connection.response[0].get("attributes"))
 
 
 @contextmanager
