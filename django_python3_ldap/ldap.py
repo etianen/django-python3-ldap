@@ -129,7 +129,7 @@ class Connection(object):
         in settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
         """
         # Search the LDAP database.
-        return self._connection.search(
+        self._connection.search(
             search_base=settings.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter(kwargs),
             search_scope=ldap3.SUBTREE,
@@ -137,6 +137,7 @@ class Connection(object):
             get_operational_attributes=True,
             size_limit=1,
         )
+        return True if self._connection.response[0].get("attributes") else False
 
 
 @contextmanager
