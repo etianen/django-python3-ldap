@@ -129,7 +129,7 @@ class Connection(object):
         in settings.LDAP_AUTH_USER_LOOKUP_FIELDS.
         """
         # Search the LDAP database.
-        return self._connection.search(
+        self._connection.search(
             search_base=settings.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter(kwargs),
             search_scope=ldap3.SUBTREE,
@@ -137,6 +137,7 @@ class Connection(object):
             get_operational_attributes=True,
             size_limit=1,
         )
+        return bool(len(self._connection.response) > 0 and self._connection.response[0].get("attributes"))
 
 
 @contextmanager
@@ -207,18 +208,22 @@ def connection(**kwargs):
             c.start_tls(read_server_info=False)
         # Perform initial authentication bind.
         c.bind(read_server_info=True)
+        User = get_user_model()
         # If the settings specify an alternative username and password for querying, rebind as that.
-        if (
-            (settings.LDAP_AUTH_CONNECTION_USERNAME or settings.LDAP_AUTH_CONNECTION_PASSWORD) and
-            (
-                settings.LDAP_AUTH_CONNECTION_USERNAME != username or
-                settings.LDAP_AUTH_CONNECTION_PASSWORD != password
+        settings_username = (
+            format_username(
+                {User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}
             )
+            if settings.LDAP_AUTH_CONNECTION_USERNAME
+            else None
+        )
+        settings_password = settings.LDAP_AUTH_CONNECTION_PASSWORD
+        if (settings_username or settings_password) and (
+            settings_username != username or settings_password != password
         ):
-            User = get_user_model()
             c.rebind(
-                user=format_username({User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME}),
-                password=settings.LDAP_AUTH_CONNECTION_PASSWORD,
+                user=settings_username,
+                password=settings_password,
             )
         # Return the connection.
         logger.info("LDAP connect succeeded")

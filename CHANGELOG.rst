@@ -1,6 +1,18 @@
 django-python3-ldap changelog
 =============================
 
+0.15.5
+------
+
+- BUGFIX: Fixing ``has_user`` detection in Active Directory (@etianen, @zq3936, @jcanning).
+
+
+0.15.4
+------
+
+- BUGFIX: Fixing redundant rebind when `LDAP_AUTH_CONNECTION_USERNAME` matches the existing username (@gagantrivedi).
+
+
 0.15.3
 ------
 
