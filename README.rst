@@ -1,7 +1,7 @@
 django-python3-ldap
 ===================
 
-**django-python3-ldap** provides a Django LDAP user authentication backend. Python 3.6+ is required.
+**django-python3-ldap** provides a Django LDAP user authentication backend.
 
 
 Features
@@ -37,9 +37,21 @@ Available settings
     # Initiate TLS on connection.
     LDAP_AUTH_USE_TLS = False
 
-    # Specify which TLS version to use (Python 3.10 requires TLSv1 or higher)
+
+    # SSL or TLS version to use, can be one of the following: SSLv2, SSLv3, SSLv23, TLSv1 (as per Python 3.3.
+      The version list can be different in other Python versions)
     import ssl
-    LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
+    LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLS
+
+    # Specifies if the server certificate must be validated, values can be: CERT_NONE (certificates are ignored),
+    CERT_OPTIONAL (not required, but validated if provided) and CERT_REQUIRED (required and validated)
+    LDAP_AUTH_TLS_VALIDATE_CERT = ssl.CERT_OPTIONAL
+
+    # The certificate of the server
+    LDAP_AUTH_TLS_LOCAL_CERT_FILE = None
+
+    # A  a string that specify which cihpers must be used. See https://ldap3.readthedocs.io/en/latest/ssltls.html
+    LDAP_AUTH_TLS_CIPHERS = None
 
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = "ou=people,dc=example,dc=com"
@@ -55,6 +67,9 @@ Available settings
         "last_name": "sn",
         "email": "mail",
     }
+
+    # A list of LDAP ATTRIBUTES to limit requests to. See also - https://ldap3.readthedocs.io/en/latest/searches.html#attributes
+    LDAP_AUTH_ATTRIBUTES = '*'
 
     # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
@@ -80,6 +95,9 @@ Available settings
     # a string of the username to bind to the LDAP server.
     # Use this to support different types of LDAP server.
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
+
+    # A single attribute or a list of attributes to be returned by LDAP operations.
+    LDAP_AUTH_ATTRIBUTES = ldap3.ALL_ATTRIBUTES
 
     # Sets the login domain for Active Directory users.
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
@@ -148,7 +166,7 @@ The signature of the called function is:-
 
 .. code:: python
 
-    def sync_user_relations(user, ldap_attributes, *, connection=None, dn=None):
+    def sync_user_relations(user, ldap_attributes, *, connection=None, dn=None, settings=None):
 
 The parameters are:-
 
@@ -156,6 +174,7 @@ The parameters are:-
 - ``ldap_attributes`` - a dict of LDAP attributes
 - ``connection`` - the LDAP connection object (optional keyword only parameter)
 - ``dn`` - the DN (Distinguished Name) of the LDAP matched user (optional keyword only parameter)
+- ``settings`` - the settings for the calling backend
 
 
 Clean User
@@ -246,6 +265,60 @@ admin interface.
 
 Running ``ldap_sync_users`` as a background cron task is another optional way to
 keep all users in sync on a regular basis.
+
+
+Multiple LDAP Configurations
+----------------------------
+You may want to configure more then one authentication backend using this module, for instance if authenticating
+against two different directory services requiring different configurations. This can be accomplished by subclassing
+``django_python3_ldap.auth.LDAPBackend`` and overriding the ``settings_prefix`` attribute.
+
+The default value for `settings_prefix` is 'AUTH_LDAP', and by default the available settings start with this value,
+however this can overwritten to allow multiple isolated configurations.
+
+For example:
+
+.. code:: python
+
+    from django_python3_ldap.auth import LDAPBackend
+
+    class LDAPBackend1(LDAPBackend):
+        settings_prefix = "AUTH_LDAP_1_"
+
+    class LDAPBackend2(LDAPBackend):
+        settings_prefix = "AUTH_LDAP_2_"
+
+
+Then in ```settings.py```,
+
+.. code:: python
+
+   AUTHENTICATION_BACKENDS = ("path.to.your.LDAPBackend1", "path.to.your.LDAPBackend2")
+   LDAP_AUTH_1_URL = ["ldap://ldap.company1.com:389"]
+   LDAP_AUTH_1_FORMAT_SEARCH_FILTERS = "path.to.your.custom_format_search_filters"
+   LDAP_AUTH_2_URL = ["ldap://dc1.company2.com:389"]
+
+Many settings options accept a path to a callable. If your callable's signature specifically has a  named ```settings```
+a argument, the settings for the assoicated  backend will be passed. This object will use standard attribute names
+(i.e. starting with 'LDAP_AUTH') and not the set prefix. For example,
+
+.. code:: python
+
+  def custom_format_search_filters(ldap_fields, settings):
+
+       # Note standard attribute name (i.e. not LDAP_AUTH_1_FORMAT_SEARCH_FILTERS)
+       domain =  settings.LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN
+       # Do something
+
+
+The management command  ``./manage.py ldap_sync_users`` can be also be used for subclassed backends, but you must
+specify the backend class using the ``--backend`` option. For example,
+
+.. code:: sh
+
+    ./manage.py ldap_sync_users --backend "mypackage.custom_backend.LDAPBackend1"
+
+
 
 
 Support and announcements

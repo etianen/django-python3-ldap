@@ -4,12 +4,11 @@ from django.db import transaction
 from django.db.models import ProtectedError
 
 from django_python3_ldap import ldap
-from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import group_lookup_args
+from django_python3_ldap.utils import get_all_backend_settings
 
 
 class Command(BaseCommand):
-
     help = "Remove local user models for users not find anymore in the remote LDAP authentication server."
 
     def add_arguments(self, parser):
@@ -36,6 +35,10 @@ class Command(BaseCommand):
             action='store_true',
             help='Handle staff user (by default,staff users are excluded)'
         )
+
+    def __init__(self, *args, **kwargs):
+        self.backends = get_all_backend_settings()
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def _iter_local_users(User, lookups, superuser, staff):
@@ -87,26 +90,45 @@ class Command(BaseCommand):
         superuser = kwargs.get('superuser', False)
         staff = kwargs.get('staff', False)
         User = get_user_model()
+
+        users_yet_to_identify = set(self._iter_local_users(User, lookups, superuser, staff))
+
+        for backend in self.backends.keys():
+            identified_users = self.identify_in_backend(backend, users_yet_to_identify)
+            users_yet_to_identify = users_yet_to_identify - identified_users
+
+        for user in users_yet_to_identify:
+            # Clean user
+            self._remove(user, purge)
+            if verbosity >= 1:
+                self.stdout.write("{action} {user}".format(
+                    action=('Purged' if purge else 'Deactivated'),
+                    user=user,
+                ))
+
+    def identify_in_backend(self, backend, users):
+        """
+        Returns a set of users who exist in `backend`.
+        """
+        identified_users = set()
+        settings = self.backends[backend]
+        User = get_user_model()
+
         auth_kwargs = {
             User.USERNAME_FIELD: settings.LDAP_AUTH_CONNECTION_USERNAME,
             'password': settings.LDAP_AUTH_CONNECTION_PASSWORD
         }
-        with ldap.connection(**auth_kwargs) as connection:
+
+        with ldap.connection(settings, **auth_kwargs) as connection:
             if connection is None:
                 raise CommandError("Could not connect to LDAP server")
-            for user in self._iter_local_users(User, lookups, superuser, staff):
+            for user in users:
                 # For each local users
                 # Check if user still exists
                 user_kwargs = {
                     User.USERNAME_FIELD: getattr(user, User.USERNAME_FIELD)
                 }
                 if connection.has_user(**user_kwargs):
-                    # User still exists on LDAP side
-                    continue
-                # Clean user
-                self._remove(user, purge)
-                if verbosity >= 1:
-                    self.stdout.write("{action} {user}".format(
-                        action=('Purged' if purge else 'Deactivated'),
-                        user=user,
-                    ))
+                    identified_users.add(user)
+
+        return identified_users

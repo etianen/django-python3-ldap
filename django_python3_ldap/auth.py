@@ -5,7 +5,8 @@ Django authentication backend.
 from django.contrib.auth.backends import ModelBackend
 
 from django_python3_ldap import ldap
-
+from django_python3_ldap.conf import LazySettings
+from django.conf import settings
 
 class LDAPBackend(ModelBackend):
 
@@ -18,6 +19,16 @@ class LDAPBackend(ModelBackend):
     """
 
     supports_inactive_user = False
+    settings_prefix = "LDAP_AUTH"
 
     def authenticate(self, *args, **kwargs):
-        return ldap.authenticate(*args, **kwargs)
+        prefixed_settings = self.get_settings()
+        return ldap.authenticate(*args, settings=prefixed_settings, **kwargs)
+
+    @classmethod
+    def get_settings(cls):
+        """
+        Retrieve settings proxy object based on `settings_prefix`.
+        :return: A LazySettings object to be used for authentication.
+        """
+        return LazySettings(settings, settings_prefix=cls.settings_prefix)
