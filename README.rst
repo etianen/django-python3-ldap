@@ -1,7 +1,7 @@
 django-python3-ldap
 ===================
 
-**django-python3-ldap** provides a Django LDAP user authentication backend.
+**django-python3-ldap** provides a Django LDAP user authentication backend.  Python 3.6+ is required.
 
 
 Features
@@ -38,10 +38,9 @@ Available settings
     LDAP_AUTH_USE_TLS = False
 
 
-    # SSL or TLS version to use, can be one of the following: SSLv2, SSLv3, SSLv23, TLSv1 (as per Python 3.3.
-      The version list can be different in other Python versions)
+    # Specify which TLS version to use (Python 3.10 requires TLSv1 or higher)
     import ssl
-    LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLS
+    LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
 
     # Specifies if the server certificate must be validated, values can be: CERT_NONE (certificates are ignored),
     CERT_OPTIONAL (not required, but validated if provided) and CERT_REQUIRED (required and validated)
