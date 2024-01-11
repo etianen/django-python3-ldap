@@ -1,6 +1,7 @@
 # encoding=utf-8
 from __future__ import unicode_literals
 
+import ssl
 from unittest import skipUnless, skip
 from io import StringIO
 
@@ -116,15 +117,6 @@ class TestLdap(TestCase):
         # Ensure that the user isn't recreated on second access.
         self.assertEqual(user_1.pk, user_2.pk)
 
-    @skip("FIXME: test server currently uses outdated TLS cyphers")
-    def testAuthenticateWithTLS(self):
-        with self.settings(LDAP_AUTH_USE_TLS=True):
-            user = authenticate(
-                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
-                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
-            )
-            self.assertIsInstance(user, User)
-            self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
 
     def testAuthenticateWithRebind(self):
         with self.settings(
@@ -412,3 +404,32 @@ class TestLdap(TestCase):
         call_command("ldap_clean_users", verbosity=0, purge=True)
         user_count_2 = User.objects.count()
         self.assertEqual(user_count_1, user_count_2)
+
+
+@skipUnless(settings.LDAP_AUTH_TEST_USER_USERNAME, "No settings.LDAP_AUTH_TEST_USER_USERNAME supplied.")
+@skipUnless(settings.LDAP_AUTH_TEST_USER_PASSWORD, "No settings.LDAP_AUTH_TEST_USER_PASSWORD supplied.")
+@skipUnless(settings.LDAP_AUTH_USER_LOOKUP_FIELDS == ("username",), "Cannot test using custom lookup fields.")
+@skipUnless(django_settings.AUTH_USER_MODEL == "auth.User", "Cannot test using a custom user model.")
+class TestSSL(TestCase):
+
+    def setUp(self):
+        super(TestSSL, self).setUp()
+        User.objects.all().delete()
+
+    def testAuthenticateWithTLS(self):
+        with self.settings(LDAP_AUTH_USE_TLS=True, LDAP_AUTH_TLS_VALIDATE_CERT=ssl.CERT_NONE):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.username, settings.LDAP_AUTH_TEST_USER_USERNAME)
+
+    # This should fail as server is presenting a self-signed certificate.
+    def test_validate_required_self_signed(self):
+        with self.settings(LDAP_AUTH_USE_TLS=True, LDAP_AUTH_TLS_VALIDATE_CERT=ssl.CERT_REQUIRED):
+            with self.assertRaises(Exception):
+                authenticate(
+                    username='any',
+                    password='any',
+                )

@@ -1,6 +1,7 @@
 """
 Low-level LDAP hooks.
 """
+import ssl
 
 import ldap3
 from ldap3.core.exceptions import LDAPException
@@ -97,7 +98,7 @@ class Connection(object):
             search_base=settings.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter({}),
             search_scope=ldap3.SUBTREE,
-            attributes=ldap3.ALL_ATTRIBUTES,
+            attributes=settings.LDAP_AUTH_ATTRIBUTES,
             get_operational_attributes=True,
             paged_size=30,
         )
@@ -133,11 +134,36 @@ class Connection(object):
             search_base=settings.LDAP_AUTH_SEARCH_BASE,
             search_filter=format_search_filter(kwargs),
             search_scope=ldap3.SUBTREE,
-            attributes=ldap3.ALL_ATTRIBUTES,
+            attributes=settings.LDAP_AUTH_ATTRIBUTES,
             get_operational_attributes=True,
             size_limit=1,
         )
         return bool(len(self._connection.response) > 0 and self._connection.response[0].get("attributes"))
+
+
+def get_tls_options(settings):
+    tls_options = {}
+
+    if not settings.LDAP_AUTH_USE_TLS:
+        return None
+
+    tls_options['validate'] = settings.LDAP_AUTH_TLS_VALIDATE_CERT
+
+    if tls_options['validate'] != ssl.CERT_REQUIRED:
+        logger.info(
+            "LDAP_AUTH_VALIDATE_CERT is set to not ssl.CERT_REQUIRED, certificate validation may not be enforced. This configuration is considered insecure.")
+
+    if settings.LDAP_AUTH_TLS_CA_CERTS_FILE:
+        tls_options['ca_certs_file'] = settings.LDAP_AUTH_TLS_CA_CERTS_FILE
+
+    if settings.LDAP_AUTH_TLS_VERSION:
+        tls_options['version'] = settings.LDAP_AUTH_TLS_VERSION
+
+    if settings.LDAP_AUTH_TLS_CIPHERS:
+        tls_options['ciphers'] = settings.LDAP_AUTH_TLS_CIPHERS
+
+    return (ldap3.Tls(**tls_options))
+
 
 
 @contextmanager
@@ -167,25 +193,19 @@ def connection(**kwargs):
     if not isinstance(auth_url, list):
         auth_url = [auth_url]
     for u in auth_url:
-        # Include SSL / TLS, if requested.
-        server_args = {
-            "allowed_referral_hosts": [("*", True)],
-            "get_info": ldap3.NONE,
-            "connect_timeout": settings.LDAP_AUTH_CONNECT_TIMEOUT,
-        }
-        if settings.LDAP_AUTH_USE_TLS:
-            server_args["tls"] = ldap3.Tls(
-                ciphers="ALL",
-                version=settings.LDAP_AUTH_TLS_VERSION,
-            )
         server_pool.add(
             ldap3.Server(
                 u,
-                **server_args,
+                allowed_referral_hosts=[("*", True)],
+                get_info=ldap3.NONE,
+                connect_timeout=settings.LDAP_AUTH_CONNECT_TIMEOUT,
+                tls=get_tls_options(settings),
+                use_ssl=settings.LDAP_AUTH_USE_TLS
             )
         )
     # Connect.
     try:
+        # Include SSL / TLS, if requested.
         connection_args = {
             "user": username,
             "password": password,

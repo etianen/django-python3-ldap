@@ -41,6 +41,20 @@ Available settings
     import ssl
     LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
 
+    # Specifies if the server certificate must be validated, values can be: CERT_NONE (certificates are ignored),
+    # CERT_OPTIONAL (not required, but validated if provided) and CERT_REQUIRED (required and validated). The default
+    # CERT_OPTIONAL is not secure and it is recommended that CERT_REQUIRED is used.
+    LDAP_AUTH_TLS_VALIDATE_CERT = ssl.CERT_OPTIONAL
+
+    # A string must be the path to a file in PEM format containing the server, and any number of CA certificates needed
+    # to establish the server certificate’s authenticity.
+     = None
+
+    # String in the  OpenSSL cipher list format specifying which ciphers must be used. See https://ldap3.readthedocs.io/en/latest/ssltls.html . It
+    # works on recent Python interpreters that allow to change the cipher in the SSLContext or in the the wrap_socket()
+    #method, it’s ignored on older versions.
+    LDAP_AUTH_TLS_CIPHERS = None
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = "ou=people,dc=example,dc=com"
 
@@ -55,6 +69,7 @@ Available settings
         "last_name": "sn",
         "email": "mail",
     }
+
 
     # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
@@ -80,6 +95,9 @@ Available settings
     # a string of the username to bind to the LDAP server.
     # Use this to support different types of LDAP server.
     LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
+
+    # A single attribute or a list of attributes to be returned by LDAP operations.
+    LDAP_AUTH_ATTRIBUTES = ldap3.ALL_ATTRIBUTES
 
     # Sets the login domain for Active Directory users.
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
