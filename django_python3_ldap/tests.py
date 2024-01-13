@@ -410,6 +410,37 @@ class TestLdap(TestCase):
 @skipUnless(settings.LDAP_AUTH_TEST_USER_PASSWORD, "No settings.LDAP_AUTH_TEST_USER_PASSWORD supplied.")
 @skipUnless(settings.LDAP_AUTH_USER_LOOKUP_FIELDS == ("username",), "Cannot test using custom lookup fields.")
 @skipUnless(django_settings.AUTH_USER_MODEL == "auth.User", "Cannot test using a custom user model.")
+class TestAttrib(TestCase):
+
+    def setUp(self):
+        super(TestAttrib, self).setUp()
+        User.objects.all().delete()
+
+    def testSyncUsersCreatesUsers(self):
+        with self.settings(
+               LDAP_AUTH_ATTRIBUTES=['givenName', "homeDirectory",  "uid"],
+              LDAP_AUTH_USER_FIELDS={
+                    "username": "uid",
+                    "first_name": "givenName",
+                    "last_name": "homeDirectory",
+                    "email": "mail",
+                }
+
+        ):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            self.assertIsInstance(user, User)
+            self.assertEqual(user.last_name, 'home')
+            self.assertEqual(user.email, '')
+
+
+
+@skipUnless(settings.LDAP_AUTH_TEST_USER_USERNAME, "No settings.LDAP_AUTH_TEST_USER_USERNAME supplied.")
+@skipUnless(settings.LDAP_AUTH_TEST_USER_PASSWORD, "No settings.LDAP_AUTH_TEST_USER_PASSWORD supplied.")
+@skipUnless(settings.LDAP_AUTH_USER_LOOKUP_FIELDS == ("username",), "Cannot test using custom lookup fields.")
+@skipUnless(django_settings.AUTH_USER_MODEL == "auth.User", "Cannot test using a custom user model.")
 class TestSSL(TestCase):
 
     def setUp(self):
