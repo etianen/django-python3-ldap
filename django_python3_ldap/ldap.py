@@ -49,7 +49,7 @@ class Connection(object):
         user_fields = {
             field_name: (
                 attributes[attribute_name][0]
-                if isinstance(attributes[attribute_name], (list, tuple)) else
+                if isinstance(attributes[attribute_name], (list, tuple)) and len(attributes[attribute_name]) > 0 else
                 attributes[attribute_name]
             )
             for field_name, attribute_name
