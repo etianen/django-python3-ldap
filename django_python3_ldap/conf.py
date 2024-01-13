@@ -2,7 +2,6 @@
 Settings used by django-python3.
 """
 import ldap3
-import ssl
 from django.conf import settings
 
 
