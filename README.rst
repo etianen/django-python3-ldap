@@ -46,6 +46,12 @@ Available settings
     # CERT_OPTIONAL is not secure and it is recommended that CERT_REQUIRED is used.
     LDAP_AUTH_TLS_VALIDATE_CERT = ssl.CERT_OPTIONAL
 
+
+    # LDAP_AUTH_TLS_CA_CERTS_FILE a file containing the certificates of trusted certification authorities. Option is valid
+    only when using SSLContext (i.e. python 2.7.9+ and python 3.4+).
+    LDAP_AUTH_TLS_CA_CERTS_FILE = None
+
+
     # String in the  OpenSSL cipher list format specifying which ciphers must be used. See https://ldap3.readthedocs.io/en/latest/ssltls.html . It
     # works on recent Python interpreters that allow to change the cipher in the SSLContext or in the the wrap_socket()
     #method, it’s ignored on older versions.
