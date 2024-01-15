@@ -46,10 +46,8 @@ Available settings
     # is not secure and it is recommended that CERT_REQUIRED is used instead.
     LDAP_AUTH_TLS_VALIDATE_CERT = None
 
-
     # LDAP_AUTH_TLS_CA_CERTS_FILE a file containing the certificates of trusted certification authorities.
     LDAP_AUTH_TLS_CA_CERTS_FILE = None
-
 
     # String in the  OpenSSL cipher list format specifying which ciphers must be used. See https://ldap3.readthedocs.io/en/latest/ssltls.html . It
     # works on recent Python interpreters that allow to change the cipher in the SSLContext or in the the wrap_socket()
@@ -70,7 +68,6 @@ Available settings
         "last_name": "sn",
         "email": "mail",
     }
-
 
     # A tuple of django model fields used to uniquely identify a user.
     LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
