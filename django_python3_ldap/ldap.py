@@ -1,7 +1,6 @@
 """
 Low-level LDAP hooks.
 """
-import ssl
 
 import ldap3
 from ldap3.core.exceptions import LDAPException
@@ -148,7 +147,7 @@ def get_tls_options(settings):
         return None
 
     if settings.LDAP_AUTH_TLS_VALIDATE_CERT:
-       tls_options['validate'] = settings.LDAP_AUTH_TLS_VALIDATE_CERT
+        tls_options['validate'] = settings.LDAP_AUTH_TLS_VALIDATE_CERT
 
     if settings.LDAP_AUTH_TLS_CA_CERTS_FILE:
         tls_options['ca_certs_file'] = settings.LDAP_AUTH_TLS_CA_CERTS_FILE
@@ -160,7 +159,6 @@ def get_tls_options(settings):
         tls_options['ciphers'] = settings.LDAP_AUTH_TLS_CIPHERS
 
     return (ldap3.Tls(**tls_options))
-
 
 
 @contextmanager

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import ssl
-from unittest import skipUnless, skip
+from unittest import skipUnless
 from io import StringIO
 
 from django.test import TestCase, override_settings
@@ -116,7 +116,6 @@ class TestLdap(TestCase):
         )
         # Ensure that the user isn't recreated on second access.
         self.assertEqual(user_1.pk, user_2.pk)
-
 
     def testAuthenticateWithRebind(self):
         with self.settings(
@@ -418,8 +417,8 @@ class TestAttrib(TestCase):
 
     def testSyncUsersCreatesUsers(self):
         with self.settings(
-               LDAP_AUTH_ATTRIBUTES=['givenName', "homeDirectory",  "uid"],
-              LDAP_AUTH_USER_FIELDS={
+                LDAP_AUTH_ATTRIBUTES=['givenName', "homeDirectory",  "uid"],
+                LDAP_AUTH_USER_FIELDS={
                     "username": "uid",
                     "first_name": "givenName",
                     "last_name": "homeDirectory",
@@ -434,7 +433,6 @@ class TestAttrib(TestCase):
             self.assertIsInstance(user, User)
             self.assertEqual(user.last_name, 'home')
             self.assertEqual(user.email, '')
-
 
 
 @skipUnless(settings.LDAP_AUTH_TEST_USER_USERNAME, "No settings.LDAP_AUTH_TEST_USER_USERNAME supplied.")
