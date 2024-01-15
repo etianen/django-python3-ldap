@@ -43,12 +43,11 @@ Available settings
 
     # Specifies if the server certificate must be validated, values can be: CERT_NONE (certificates are ignored),
     # CERT_OPTIONAL (not required, but validated if provided) and CERT_REQUIRED (required and validated). The default
-    # CERT_OPTIONAL is not secure and it is recommended that CERT_REQUIRED is used.
-    LDAP_AUTH_TLS_VALIDATE_CERT = ssl.CERT_OPTIONAL
+    # is not secure and it is recommended that CERT_REQUIRED is used instead.
+    LDAP_AUTH_TLS_VALIDATE_CERT = None
 
 
-    # LDAP_AUTH_TLS_CA_CERTS_FILE a file containing the certificates of trusted certification authorities. Option is valid
-    only when using SSLContext (i.e. python 2.7.9+ and python 3.4+).
+    # LDAP_AUTH_TLS_CA_CERTS_FILE a file containing the certificates of trusted certification authorities.
     LDAP_AUTH_TLS_CA_CERTS_FILE = None
 
 

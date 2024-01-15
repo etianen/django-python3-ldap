@@ -464,3 +464,11 @@ class TestSSL(TestCase):
                     username='any',
                     password='any',
                 )
+
+    def test_validate_not_specified_self_signed(self):
+        with self.settings(LDAP_AUTH_USE_TLS=True):
+            with self.assertRaises(Exception):
+                authenticate(
+                    username='any',
+                    password='any',
+                )
