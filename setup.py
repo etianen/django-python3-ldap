@@ -23,7 +23,7 @@ setup(
     install_requires=[
         "django>=1.11",
         "ldap3>=2.5,<3",
-        "pyasn1>=0.4.6,<0.5",
+        "pyasn1>=0.4.6,<0.6",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
