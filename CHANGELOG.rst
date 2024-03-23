@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.15.6
+------
+
+- Support for pyasn1 0.5.x (@borislaviv).
+
+
 0.15.5
 ------
 
