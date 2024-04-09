@@ -1,8 +1,7 @@
 """
 Settings used by django-python3.
 """
-from ssl import PROTOCOL_TLS
-
+import ldap3
 from django.conf import settings
 
 
@@ -46,7 +45,22 @@ class LazySettings(object):
 
     LDAP_AUTH_TLS_VERSION = LazySetting(
         name="LDAP_AUTH_TLS_VERSION",
-        default=PROTOCOL_TLS,
+        default=None,
+    )
+
+    LDAP_AUTH_TLS_VALIDATE_CERT = LazySetting(
+        name="LDAP_AUTH_TLS_VALIDATE_CERT",
+        default=None,
+    )
+
+    LDAP_AUTH_TLS_CA_CERTS_FILE = LazySetting(
+        name="LDAP_AUTH_TLS_CA_CERTS_FILE",
+        default=None,
+    )
+
+    LDAP_AUTH_TLS_CIPHERS = LazySetting(
+        name="LDAP_AUTH_TLS_CIPHERS",
+        default=None,
     )
 
     LDAP_AUTH_SEARCH_BASE = LazySetting(
@@ -94,6 +108,11 @@ class LazySettings(object):
     LDAP_AUTH_FORMAT_USERNAME = LazySetting(
         name="LDAP_AUTH_FORMAT_USERNAME",
         default="django_python3_ldap.utils.format_username_openldap",
+    )
+
+    LDAP_AUTH_ATTRIBUTES = LazySetting(
+        name="LDAP_AUTH_ATTRIBUTES",
+        default=ldap3.ALL_ATTRIBUTES,
     )
 
     LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = LazySetting(
