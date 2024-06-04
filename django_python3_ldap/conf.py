@@ -136,5 +136,10 @@ class LazySettings(object):
         default=None
     )
 
+    LDAP_AUTH_POOL_ACTIVE = LazySetting(
+        name="LDAP_AUTH_POOL_ACTIVE",
+        default=True
+    )
+
 
 settings = LazySettings(settings)
