@@ -41,6 +41,12 @@ Available settings
     import ssl
     LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
 
+    # Specify which TLS ciphers to use
+    LDAP_AUTH_TLS_VERSION = "ALL"
+
+    # Unspecified Tls keyword arguments applied to the connection on the underlying Ldap3 library.
+    LDAP_AUTH_TLS_ARGS = {}
+
     # The LDAP search base for looking up users.
     LDAP_AUTH_SEARCH_BASE = "ou=people,dc=example,dc=com"
 
@@ -90,9 +96,15 @@ Available settings
     LDAP_AUTH_CONNECTION_USERNAME = None
     LDAP_AUTH_CONNECTION_PASSWORD = None
 
+    # Use SSL on the connection
+    LDAP_AUTH_CONNECT_USE_SSL
+
     # Set connection/receive timeouts (in seconds) on the underlying `ldap3` library.
     LDAP_AUTH_CONNECT_TIMEOUT = None
     LDAP_AUTH_RECEIVE_TIMEOUT = None
+
+    # Unspecified keyword arguments to apply to the connection in the underlying ldap3 library.
+    LDAP_AUTH_CONNECT_ARGS = {}
 
 
 Microsoft Active Directory support
