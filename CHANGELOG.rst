@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.15.7
+------
+
+- Added ``LDAP_AUTH_POOL_ACTIVE`` setting (@borislaviv).
+
+
 0.15.6
 ------
 
