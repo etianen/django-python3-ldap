@@ -149,6 +149,18 @@ class TestLdap(TestCase):
             )
             self.assertIs(user, None)
 
+    def testAuthenticateWithLimitedRetries(self):
+        # simulate offline server
+        with self.settings(
+            LDAP_AUTH_URL=["ldap://example.com:389"],
+            LDAP_AUTH_POOL_ACTIVE=1,
+        ):
+            user = authenticate(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+        self.assertEqual(user, None)
+
     # User synchronisation.
 
     def testSyncUsersCreatesUsers(self):

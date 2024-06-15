@@ -106,6 +106,8 @@ Available settings
     # Unspecified keyword arguments to apply to the connection in the underlying `ldap3` library.
     LDAP_AUTH_CONNECT_ARGS = {}
 
+    # Set connection pool `active` parameter on the underlying `ldap3` library.
+    LDAP_AUTH_POOL_ACTIVE = True
 
 Microsoft Active Directory support
 ----------------------------------
