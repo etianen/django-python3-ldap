@@ -103,7 +103,7 @@ Available settings
     LDAP_AUTH_CONNECT_TIMEOUT = None
     LDAP_AUTH_RECEIVE_TIMEOUT = None
 
-    # Unspecified keyword arguments to apply to the connection in the underlying ldap3 library.
+    # Unspecified keyword arguments to apply to the connection in the underlying `ldap3` library.
     LDAP_AUTH_CONNECT_ARGS = {}
 
 
