@@ -41,7 +41,7 @@ Available settings
     import ssl
     LDAP_AUTH_TLS_VERSION = ssl.PROTOCOL_TLSv1_2
 
-    # Specify which TLS ciphers to use
+    # Specify which TLS ciphers to use.
     LDAP_AUTH_TLS_VERSION = "ALL"
 
     # Unspecified Tls keyword arguments applied to the connection on the underlying Ldap3 library.
