@@ -44,7 +44,7 @@ Available settings
     # Specify which TLS ciphers to use.
     LDAP_AUTH_TLS_VERSION = "ALL"
 
-    # Unspecified Tls keyword arguments applied to the connection on the underlying Ldap3 library.
+    # Unspecified TLS keyword arguments applied to the connection on the underlying `ldap3` library.
     LDAP_AUTH_TLS_ARGS = {}
 
     # The LDAP search base for looking up users.
