@@ -94,6 +94,8 @@ Available settings
     LDAP_AUTH_CONNECT_TIMEOUT = None
     LDAP_AUTH_RECEIVE_TIMEOUT = None
 
+    # Set connection pool `active` parameter on the underlying `ldap3` library.
+    LDAP_AUTH_POOL_ACTIVE = True
 
 Microsoft Active Directory support
 ----------------------------------
