@@ -44,9 +44,19 @@ class LazySettings(object):
         default=False,
     )
 
+    LDAP_AUTH_TLS_CIPHERS = LazySetting(
+        name="LDAP_AUTH_TLS_CIPHERS",
+        default="ALL",
+    )
+
     LDAP_AUTH_TLS_VERSION = LazySetting(
         name="LDAP_AUTH_TLS_VERSION",
         default=PROTOCOL_TLS,
+    )
+
+    LDAP_AUTH_TLS_ARGS = LazySetting(
+        name="LDAP_AUTH_TLS_ARGS",
+        default={},
     )
 
     LDAP_AUTH_SEARCH_BASE = LazySetting(
@@ -124,6 +134,16 @@ class LazySettings(object):
     LDAP_AUTH_CONNECTION_PASSWORD = LazySetting(
         name="LDAP_AUTH_CONNECTION_PASSWORD",
         default=None,
+    )
+
+    LDAP_AUTH_CONNECT_ARGS = LazySetting(
+        name="LDAP_AUTH_CONNECT_ARGS",
+        default={},
+    )
+
+    LDAP_AUTH_CONNECT_USE_SSL = LazySetting(
+        name="LDAP_AUTH_CONNECT_USE_SSL",
+        default=False,
     )
 
     LDAP_AUTH_CONNECT_TIMEOUT = LazySetting(

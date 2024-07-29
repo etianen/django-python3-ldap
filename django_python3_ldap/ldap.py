@@ -176,11 +176,14 @@ def connection(**kwargs):
             "allowed_referral_hosts": [("*", True)],
             "get_info": ldap3.NONE,
             "connect_timeout": settings.LDAP_AUTH_CONNECT_TIMEOUT,
+            "use_ssl": settings.LDAP_AUTH_CONNECT_USE_SSL,
+            **settings.LDAP_AUTH_CONNECT_ARGS
         }
         if settings.LDAP_AUTH_USE_TLS:
             server_args["tls"] = ldap3.Tls(
-                ciphers="ALL",
+                ciphers=settings.LDAP_AUTH_TLS_CIPHERS,
                 version=settings.LDAP_AUTH_TLS_VERSION,
+                **settings.LDAP_AUTH_TLS_ARGS
             )
         server_pool.add(
             ldap3.Server(
