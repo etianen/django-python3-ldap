@@ -64,6 +64,10 @@ def clean_user_data(model_fields):
     Transforms the user data loaded from
     LDAP into a form suitable for creating a user.
     """
+    for field in model_fields:
+        if isinstance(model_fields[field], (list, tuple)):
+            model_fields[field] = model_fields[field][0]
+
     return model_fields
 
 
