@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.15.8
+------
+
+- Added ``LDAP_AUTH_TLS_CIPHERS``, ``LDAP_AUTH_TLS_ARGS``, ``LDAP_AUTH_CONNECT_USE_SSL`` and ``LDAP_AUTH_CONNECT_ARGS`` settings (@Freddo3000).
+
+
 0.15.7
 ------
 
