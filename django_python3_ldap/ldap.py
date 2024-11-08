@@ -251,6 +251,12 @@ def authenticate(*args, **kwargs):
     in settings.LDAP_AUTH_USER_LOOKUP_FIELDS, plus a `password` argument.
     """
     password = kwargs.pop("password", None)
+
+    if settings_prefix := kwargs.pop("prefix"):
+        settings.set_or_clear_prefix(settings_prefix)
+    else:
+        settings.set_or_clear_prefix()
+
     auth_user_lookup_fields = frozenset(settings.LDAP_AUTH_USER_LOOKUP_FIELDS)
     ldap_kwargs = {
         key: value for (key, value) in kwargs.items()
