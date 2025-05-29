@@ -22,6 +22,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "django>=1.11",
+        "asgiref>=2.0.0",
         "ldap3>=2.5,<3",
         "pyasn1>=0.4.6,<0.6",
     ],
