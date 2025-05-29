@@ -1,15 +1,17 @@
 # encoding=utf-8
 from __future__ import unicode_literals
 
-from unittest import skipUnless, skip
+from unittest import skipUnless, skip, mock
 from io import StringIO
 
+from asgiref.sync import async_to_sync
 from django.test import TestCase, override_settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.conf import settings as django_settings
 from django.core.management import call_command, CommandError
 
+from django_python3_ldap.auth import run_authentication_async
 from django_python3_ldap.conf import settings
 from django_python3_ldap.ldap import connection
 from django_python3_ldap.utils import clean_ldap_name, import_func
@@ -160,6 +162,16 @@ class TestLdap(TestCase):
                 password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
             )
         self.assertEqual(user, None)
+
+    def testAuthenticateAsyncRunner(self):
+        async_runner = async_to_sync(run_authentication_async)
+
+        with mock.patch("django_python3_ldap.ldap.authenticate") as mocked_authenticate_call:
+            async_runner(
+                username=settings.LDAP_AUTH_TEST_USER_USERNAME,
+                password=settings.LDAP_AUTH_TEST_USER_PASSWORD,
+            )
+            mocked_authenticate_call.assert_called()
 
     # User synchronisation.
 
