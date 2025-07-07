@@ -15,6 +15,7 @@ jobs:
           - '>=5.1,<5.2'
           - '>=5.0,<5.1'
           - '>=4.2,<4.3'
+        fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
