@@ -1,6 +1,11 @@
 django-python3-ldap changelog
 =============================
 
+0.16.0
+------
+
+- Added async ``aauthenticate`` support to ``LDAPBackend`` (@CristopherH95).
+
 0.15.8
 ------
 
