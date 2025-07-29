@@ -19,7 +19,13 @@ class LazySetting(object):
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        return getattr(obj._settings, self.name, self.default)
+
+        property_name = self.name
+
+        if hasattr(obj._settings, (name_with_prefix := obj._prefix + self.name)):
+            property_name = name_with_prefix
+
+        return getattr(obj._settings, property_name, self.default)
 
 
 class LazySettings(object):
@@ -31,8 +37,19 @@ class LazySettings(object):
     to change settings at runtime.
     """
 
-    def __init__(self, settings):
+    def __init__(self, settings, prefix=''):
         self._settings = settings
+        self._prefix = prefix
+
+    def set_or_clear_prefix(self, new_prefix=''):
+        """
+        Setter method for the _prefix property, is called before each authentication.
+        This allows users to use multiple LDAP configs at the same time.
+
+        Args:
+            new_prefix (str, optional): The string that should be appended to the default constant names. Defaults to an empty string.
+        """
+        self._prefix = new_prefix
 
     LDAP_AUTH_URL = LazySetting(
         name="LDAP_AUTH_URL",
