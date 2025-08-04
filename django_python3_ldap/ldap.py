@@ -30,7 +30,7 @@ class Connection(object):
         """
         self._connection = connection
 
-    def _get_or_create_user(self, user_data):
+    def _get_or_create_user(self, user_data, request=None):
         """
         Returns a Django user for the given LDAP user data.
 
@@ -62,11 +62,17 @@ class Connection(object):
             for field_name
             in settings.LDAP_AUTH_USER_LOOKUP_FIELDS
         }
+
         # Update or create the user.
-        user, created = User.objects.update_or_create(
-            defaults=user_fields,
-            **user_lookup
-        )
+        if settings.LDAP_AUTH_ASSOCIATE_EXISTING_USER and request.user.is_authenticated:
+            user = request.user
+            created = False
+        else:
+            user, created = User.objects.update_or_create(
+                defaults=user_fields,
+                **user_lookup
+            )
+
         # If the user was created, set them an unusable password.
         if created:
             user.set_unusable_password()
@@ -108,7 +114,7 @@ class Connection(object):
             if entry["type"] == "searchResEntry"
         ))
 
-    def get_user(self, **kwargs):
+    def get_user(self, request, **kwargs):
         """
         Returns the user with the given identifier.
 
@@ -117,7 +123,7 @@ class Connection(object):
         """
         # Search the LDAP database.
         if self.has_user(**kwargs):
-            return self._get_or_create_user(self._connection.response[0])
+            return self._get_or_create_user(self._connection.response[0], request)
         logger.warning("LDAP user lookup failed")
         return None
 
@@ -242,7 +248,7 @@ def connection(**kwargs):
         c.unbind()
 
 
-def authenticate(*args, **kwargs):
+def authenticate(request, *args, **kwargs):
     """
     Authenticates with the LDAP server, and returns
     the corresponding Django user instance.
@@ -265,4 +271,4 @@ def authenticate(*args, **kwargs):
     with connection(password=password, **ldap_kwargs) as c:
         if c is None:
             return None
-        return c.get_user(**ldap_kwargs)
+        return c.get_user(request, **ldap_kwargs)

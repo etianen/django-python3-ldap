@@ -109,6 +109,11 @@ Available settings
     # Set connection pool `active` parameter on the underlying `ldap3` library.
     LDAP_AUTH_POOL_ACTIVE = True
 
+    # Whether an LDAP login as part of an existing user session (for example due to a prior login using a different
+    # authentication backend) should update the existing user object and preserve the user in the session instead
+    # of creating a new user object.
+    LDAP_AUTH_ASSOCIATE_EXISTING_USER = False
+
 Microsoft Active Directory support
 ----------------------------------
 

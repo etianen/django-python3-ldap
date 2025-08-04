@@ -161,5 +161,10 @@ class LazySettings(object):
         default=True
     )
 
+    LDAP_AUTH_ASSOCIATE_EXISTING_USER = LazySetting(
+        name="LDAP_AUTH_ASSOCIATE_EXISTING_USER",
+        default=False
+    )
+
 
 settings = LazySettings(settings)
