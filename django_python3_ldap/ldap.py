@@ -89,7 +89,9 @@ class Connection(object):
             else:
                 raise TypeError(f"Unknown kw argument {argname} in signature for LDAP_AUTH_SYNC_USER_RELATIONS")
         # call sync_user_relations_func() with original args plus supported named extras
-        sync_user_relations_func(user, attributes, **args)
+        sync_user = sync_user_relations_func(user, attributes, **args)
+        if sync_user is not None:
+            user = sync_user
         # All done!
         logger.info("LDAP user lookup succeeded")
         return user

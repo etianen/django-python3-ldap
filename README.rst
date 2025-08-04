@@ -176,6 +176,8 @@ The parameters are:-
 - ``connection`` - the LDAP connection object (optional keyword only parameter)
 - ``dn`` - the DN (Distinguished Name) of the LDAP matched user (optional keyword only parameter)
 
+The function can optionally return a user object to forward to ``authenticate()`` instead of the original user.
+This is useful in combination with ``LDAP_AUTH_ASSOCIATE_EXISTING_USER``.
 
 Clean User
 ----------
