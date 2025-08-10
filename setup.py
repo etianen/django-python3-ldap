@@ -23,7 +23,7 @@ setup(
         "django>=4.2",
         "asgiref>=2.0.0",
         "ldap3>=2.5,<3",
-        "pyasn1>=0.4.6,<0.6",
+        "pyasn1>=0.4.6,<0.7",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
