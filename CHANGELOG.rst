@@ -1,6 +1,12 @@
 django-python3-ldap changelog
 =============================
 
+0.16.1
+------
+
+- Allow for ``pyasn1`` 0.6.x (@tacerus).
+
+
 0.16.0
 ------
 
