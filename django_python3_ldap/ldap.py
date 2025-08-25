@@ -11,12 +11,10 @@ from django.contrib.auth import get_user_model
 from django_python3_ldap.conf import settings
 from django_python3_ldap.utils import import_func, format_search_filter
 
-
 logger = logging.getLogger(__name__)
 
 
 class Connection(object):
-
     """
     A connection to an LDAP server.
     """
@@ -46,11 +44,9 @@ class Connection(object):
 
         # Create the user data.
         user_fields = {
-            field_name: (
-                attributes[attribute_name][0]
-                if isinstance(attributes[attribute_name], (list, tuple)) else
-                attributes[attribute_name]
-            )
+            field_name: attributes[attribute_name][0]
+            if len(attributes[attribute_name]) == 1
+            else attributes[attribute_name]
             for field_name, attribute_name
             in settings.LDAP_AUTH_USER_FIELDS.items()
             if attribute_name in attributes
@@ -226,7 +222,7 @@ def connection(**kwargs):
         )
         settings_password = settings.LDAP_AUTH_CONNECTION_PASSWORD
         if (settings_username or settings_password) and (
-            settings_username != username or settings_password != password
+                settings_username != username or settings_password != password
         ):
             c.rebind(
                 user=settings_username,
